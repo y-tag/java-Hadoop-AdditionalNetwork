@@ -45,12 +45,10 @@ public class AllReduceClient extends AllReducer<IntWritable> implements Runnable
 
     @Override
     public void run() {
-        /*
         try {
             Thread.sleep(2 * 1000);
         } catch (InterruptedException e) {
         }
-        */
 
         IntWritable w = new IntWritable(1);
         for (int i = 0; i < 5; i++) {
@@ -73,11 +71,9 @@ public class AllReduceClient extends AllReducer<IntWritable> implements Runnable
 
         for (int i = 0; i < 5; i++) {
             AllReduceClient ar = new AllReduceClient(host, port);
-            ar.run();
-            ar.close();
 
-            //Thread thread = new Thread(ar);
-            //thread.start();
+            Thread thread = new Thread(ar);
+            thread.start();
         }
     }
 }
