@@ -16,10 +16,15 @@ import java.util.HashMap;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableUtils;
 
 public class AllReduceCoordinator<T extends Writable> implements Runnable {
     private ServerSocket serverSocket;
     private HashMap<String, LinkedList<NodeInfo>> nodeInfoQueueMap;
+
+    public enum Command {
+        registerListingInfo, requestParentInfo, connectionClosed
+    }
 
     public class NodeInfo {
         String nodeHostName;
@@ -56,56 +61,66 @@ public class AllReduceCoordinator<T extends Writable> implements Runnable {
 
         @Override
         public void run() {
-            try {
-                // receive listening info from node
-                String groupName = "";
-                int nodeId = -1;
-                int totalNumNode = 1;
-                String hostName = this.socket.getInetAddress().getHostName();
-                int hostPort = -1;
-                {
-                    groupName = Text.readString(inStream);
+            boolean waiting = true;
+            while (waiting) {
+                try {
+                    // recieve command and groupName
+                    Command command = WritableUtils.readEnum(inStream, Command.class);
+                    String groupName = Text.readString(inStream);
 
-                    IntWritable hostPortWritable = new IntWritable();
-                    hostPortWritable.readFields(inStream);
-                    hostPort = hostPortWritable.get();
-                }
+                    // get Queue for groupName
+                    if (! nodeInfoQueueMap.containsKey(groupName)) {
+                        nodeInfoQueueMap.put(groupName, new LinkedList<NodeInfo>());
+                    }
+                    Queue<NodeInfo> nodeInfoQueue = nodeInfoQueueMap.get(groupName);
 
-                System.out.println("received: " + hostName + ":" + Integer.toString(hostPort));
+                    switch (command) {
+                        case registerListingInfo:
+                            // receive listening info from node
+                            String hostName = this.socket.getInetAddress().getHostName();
+                            IntWritable hostPortWritable = new IntWritable();
+                            hostPortWritable.readFields(inStream);
+                            int hostPort = hostPortWritable.get();
 
-                // get Queue for groupName
-                if (! nodeInfoQueueMap.containsKey(groupName)) {
-                    nodeInfoQueueMap.put(groupName, new LinkedList<NodeInfo>());
-                }
-                Queue<NodeInfo> nodeInfoQueue = nodeInfoQueueMap.get(groupName);
+                            // register node info
+                            if (1024 <= hostPort && hostPort <= 65535) {
+                                NodeInfo nodeInfo = new NodeInfo(hostName, hostPort);
+                                nodeInfoQueue.offer(nodeInfo);
+                            }
 
-                // send info of parent node to node
-                {
-                    String parentHostName = "";
-                    int parentHostPort = -1;
+                            System.err.println(hostName + ":" + Integer.toString(hostPort));
+                            break;
 
-                    NodeInfo parentNodeInfo = nodeInfoQueue.poll();
-                    if (parentNodeInfo != null) {
-                        parentHostName = parentNodeInfo.getHostName();
-                        parentHostPort = parentNodeInfo.getHostPort();
+                        case requestParentInfo:
+                            String parentHostName = "";
+                            int parentHostPort = -1;
+
+                            NodeInfo parentNodeInfo = nodeInfoQueue.poll();
+                            if (parentNodeInfo != null) {
+                                parentHostName = parentNodeInfo.getHostName();
+                                parentHostPort = parentNodeInfo.getHostPort();
+                            }
+
+                            Text.writeString(outStream, parentHostName);
+                            (new IntWritable(parentHostPort)).write(outStream);
+                            outStream.flush();
+
+                            break;
+
+                        case connectionClosed:
+                            waiting = false;
+                            break;
+
+                        default:
+                            System.err.println("Unknown command");
+                            break;
                     }
 
-                    Text.writeString(outStream, parentHostName);
-                    (new IntWritable(parentHostPort)).write(outStream);
-                    outStream.flush();
+                } catch (IOException e) {
+                    System.err.println(e.getMessage());
                 }
-
-                // register node info
-                if (1024 <= hostPort && hostPort <= 65535) {
-                    NodeInfo nodeInfo = new NodeInfo(hostName, hostPort);
-                    nodeInfoQueue.offer(nodeInfo);
-                }
-
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
             }
         }
-
     }
 
     public AllReduceCoordinator(int listenPort) throws IOException {

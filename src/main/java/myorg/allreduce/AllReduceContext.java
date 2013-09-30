@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableUtils;
 
 public class AllReduceContext {
+    protected ConnectionListener listener;
     protected ConnectionInfo coordinatorInfo;
     protected ConnectionInfo parentInfo;
     protected List<ConnectionInfo> childrenInfo;
@@ -58,7 +60,7 @@ public class AllReduceContext {
         }
     }
 
-    protected class ConnectionListener implements Runnable {
+    protected class ConnectionListener extends Thread {
         private ServerSocket serverSocket;
 
         public ConnectionListener() throws IOException {
@@ -86,20 +88,17 @@ public class AllReduceContext {
 
     public AllReduceContext(
             String coordinatorHostName, int coordinatorHostPort, String groupName) throws IOException {
-        int connectionTimeout = 5 * 1000; // miliseconds
+        int connectionTimeout = 5 * 1000; // milliseconds
 
         // create ServerSocket and listen to connection from children reducers
         this.childrenInfo = new ArrayList<ConnectionInfo>();
-        int listenPort = -1;
         {
-            ConnectionListener listener = new ConnectionListener();
-            listenPort = listener.getPort();
-            Thread thread = new Thread(listener);
-            thread.setDaemon(true); // use daemon thread
-            thread.start();
+            listener = new ConnectionListener();
+            listener.setDaemon(true); // use daemon thread
+            listener.start();
         }
 
-        System.err.println("listen to port: " + Integer.toString(listenPort));
+        System.err.println("listen to port: " + Integer.toString(listener.getPort()));
 
         // create Socket to Coordinator
         {
@@ -110,36 +109,80 @@ public class AllReduceContext {
             this.coordinatorInfo = new ConnectionInfo(socket);
         }
 
+        setParentInfo(groupName);
+        sendListeningInfo(groupName);
+        closeConnection();
+    }
+
+    protected void sendListeningInfo(String groupName) throws IOException {
+        // send command and groupName
+        WritableUtils.writeEnum(
+                coordinatorInfo.getDataOutputStream(),
+                AllReduceCoordinator.Command.registerListingInfo
+        );
+        Text.writeString(coordinatorInfo.getDataOutputStream(), groupName);
+        coordinatorInfo.getDataOutputStream().flush();
+
         // send listening info to Coordinator
-        {
+        (new IntWritable(listener.getPort())).write(coordinatorInfo.getDataOutputStream());
+        coordinatorInfo.getDataOutputStream().flush();
+    }
+
+    protected void setParentInfo(String groupName) throws IOException {
+        int connectionTimeout = 5 * 1000; // milliseconds
+
+        boolean reconnect;
+
+        do {
+            // send command and groupName
+            WritableUtils.writeEnum(
+                    coordinatorInfo.getDataOutputStream(),
+                    AllReduceCoordinator.Command.requestParentInfo
+            );
             Text.writeString(coordinatorInfo.getDataOutputStream(), groupName);
-            (new IntWritable(listenPort)).write(coordinatorInfo.getDataOutputStream());
             coordinatorInfo.getDataOutputStream().flush();
-        }
 
-        // receive info of parent node from Coordinator
-        String parentHostName = "";
-        int parentHostPort = -1;
-        {
-            parentHostName = Text.readString(coordinatorInfo.getDataInputStream());
+            // receive info of parent node from Coordinator
+            String parentHostName = "";
+            int parentHostPort = -1;
+            {
+                parentHostName = Text.readString(coordinatorInfo.getDataInputStream());
 
-            IntWritable parentHostPortWritable = new IntWritable();
-            parentHostPortWritable.readFields(coordinatorInfo.getDataInputStream());
-            parentHostPort = parentHostPortWritable.get();
-        }
+                IntWritable parentHostPortWritable = new IntWritable();
+                parentHostPortWritable.readFields(coordinatorInfo.getDataInputStream());
+                parentHostPort = parentHostPortWritable.get();
+            }
 
-        // create Socket to parent node
-        if (parentHostPort > 0) {
-            Socket socket = new Socket();
-            socket.connect(
-                    new InetSocketAddress(parentHostName, parentHostPort),
-                    connectionTimeout);
-            this.parentInfo = new ConnectionInfo(socket);
-            System.err.println("parent node: " + this.parentInfo.getHostName() + ":" + this.parentInfo.getHostPort());
-        } else {
-            this.parentInfo = null;
-            System.err.println("no parent node, that is root node");
-        }
+            // create Socket to parent node
+            if (parentHostPort > 0) {
+                Socket socket = new Socket();
+                try {
+                    socket.connect(
+                            new InetSocketAddress(parentHostName, parentHostPort),
+                            connectionTimeout);
+                } catch (IOException e) {
+                    reconnect = true;
+                    continue;
+                }
+                this.parentInfo = new ConnectionInfo(socket);
+                System.err.println("parent node: " + this.parentInfo.getHostName() + ":" + this.parentInfo.getHostPort());
+            } else {
+                this.parentInfo = null;
+                System.err.println("no parent node, that is root node");
+            }
+            reconnect = false;
+
+        } while (reconnect);
+    }
+
+    protected void closeConnection() throws IOException {
+        // send command and dummy groupName
+        WritableUtils.writeEnum(
+                coordinatorInfo.getDataOutputStream(),
+                AllReduceCoordinator.Command.connectionClosed
+        );
+        Text.writeString(coordinatorInfo.getDataOutputStream(), "");
+        coordinatorInfo.getDataOutputStream().flush();
     }
 
     public void close() throws IOException {

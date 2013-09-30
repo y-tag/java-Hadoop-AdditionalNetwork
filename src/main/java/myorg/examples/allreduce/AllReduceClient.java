@@ -46,7 +46,7 @@ public class AllReduceClient extends AllReducer<IntWritable> implements Runnable
     @Override
     public void run() {
         try {
-            Thread.sleep(2 * 1000);
+            Thread.sleep(1 * 1000);
         } catch (InterruptedException e) {
         }
 
