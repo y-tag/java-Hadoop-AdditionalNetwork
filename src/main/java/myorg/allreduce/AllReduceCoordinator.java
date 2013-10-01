@@ -18,30 +18,16 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableUtils;
 
+import myorg.network.NodeInfoManager;
+import myorg.network.NodeInfo;
+
 public class AllReduceCoordinator<T extends Writable> implements Runnable {
     private ServerSocket serverSocket;
     private HashMap<String, LinkedList<NodeInfo>> nodeInfoQueueMap;
+    private NodeInfoManager nodeInfoManager;
 
     public enum Command {
         registerListingInfo, requestParentInfo, connectionClosed
-    }
-
-    public class NodeInfo {
-        String nodeHostName;
-        int nodeHostPort;
-
-        public NodeInfo(String hostName, int hostPort) {
-            this.nodeHostName = hostName;
-            this.nodeHostPort = hostPort;
-        }
-
-        public String getHostName() {
-            return nodeHostName;
-        }
-        
-        public int getHostPort() {
-            return nodeHostPort;
-        }
     }
 
     public class Worker implements Runnable {
@@ -68,12 +54,6 @@ public class AllReduceCoordinator<T extends Writable> implements Runnable {
                     Command command = WritableUtils.readEnum(inStream, Command.class);
                     String groupName = Text.readString(inStream);
 
-                    // get Queue for groupName
-                    if (! nodeInfoQueueMap.containsKey(groupName)) {
-                        nodeInfoQueueMap.put(groupName, new LinkedList<NodeInfo>());
-                    }
-                    Queue<NodeInfo> nodeInfoQueue = nodeInfoQueueMap.get(groupName);
-
                     switch (command) {
                         case registerListingInfo:
                             // receive listening info from node
@@ -85,7 +65,7 @@ public class AllReduceCoordinator<T extends Writable> implements Runnable {
                             // register node info
                             if (1024 <= hostPort && hostPort <= 65535) {
                                 NodeInfo nodeInfo = new NodeInfo(hostName, hostPort);
-                                nodeInfoQueue.offer(nodeInfo);
+                                nodeInfoManager.push(groupName, nodeInfo);
                             }
 
                             System.err.println(hostName + ":" + Integer.toString(hostPort));
@@ -95,7 +75,7 @@ public class AllReduceCoordinator<T extends Writable> implements Runnable {
                             String parentHostName = "";
                             int parentHostPort = -1;
 
-                            NodeInfo parentNodeInfo = nodeInfoQueue.poll();
+                            NodeInfo parentNodeInfo = nodeInfoManager.pop(groupName);
                             if (parentNodeInfo != null) {
                                 parentHostName = parentNodeInfo.getHostName();
                                 parentHostPort = parentNodeInfo.getHostPort();
@@ -125,7 +105,7 @@ public class AllReduceCoordinator<T extends Writable> implements Runnable {
 
     public AllReduceCoordinator(int listenPort) throws IOException {
         this.serverSocket = new ServerSocket(listenPort);
-        this.nodeInfoQueueMap = new HashMap<String, LinkedList<NodeInfo>>();
+        this.nodeInfoManager = new NodeInfoManager(2);
     }
 
     @Override
