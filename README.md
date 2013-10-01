@@ -6,7 +6,7 @@ GettingStarted
 
 For building jar file, just using maven.
 
-  $ mvn package
+    $ mvn package
 
 AUTHOR
 ------
