@@ -102,8 +102,18 @@ public class WeightVector implements Writable {
     public void write(DataOutput out) throws IOException {
         rescale();
         out.writeInt(weightArray.length);
+        int nonzeroNum = 0;
         for (int i = 0; i < weightArray.length; i++) {
-            out.writeFloat(weightArray[i]);
+            if (weightArray[i] != 0.0f) {
+                nonzeroNum++;
+            }
+        }
+        out.writeInt(nonzeroNum);
+        for (int i = 0; i < weightArray.length; i++) {
+            if (weightArray[i] != 0.0f) {
+                out.writeInt(i);
+                out.writeFloat(weightArray[i]);
+            }
         }
         out.writeFloat(scaleFactor);
         out.writeFloat(squaredNorm);
@@ -113,8 +123,10 @@ public class WeightVector implements Writable {
     public void readFields(DataInput in) throws IOException {
         int dim = in.readInt();
         weightArray = new float[dim];
-        for (int i = 0; i < weightArray.length; i++) {
-            weightArray[i] = in.readFloat();
+        int nonzeroNum = in.readInt();
+        for (int i = 0; i < nonzeroNum; i++) {
+            int j = in.readInt();
+            weightArray[j] = in.readFloat();
         }
         scaleFactor = in.readFloat();
         squaredNorm = in.readFloat();

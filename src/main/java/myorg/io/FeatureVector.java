@@ -104,6 +104,8 @@ public class FeatureVector implements Writable {
     public String toString() {
 
         StringBuffer sb = new StringBuffer();
+        sb.append(Float.toString(label));
+
         for (int i = 0; i < indices.length; i++) {
             if (sb.length() > 0) {
                 sb.append(' ');
@@ -111,6 +113,10 @@ public class FeatureVector implements Writable {
             sb.append(indices[i]);
             sb.append(':');
             sb.append(values[i]);
+        }
+
+        if (! name.equals("")) {
+            sb.append(" # " + name);
         }
 
         return sb.toString();
