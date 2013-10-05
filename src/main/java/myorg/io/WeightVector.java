@@ -24,6 +24,10 @@ public class WeightVector implements Writable {
     }
 
     public float innerProduct(FeatureVector x, float xScale) {
+        if (xScale == 0.0f) {
+            return 0.0f;
+        }
+
         float ip = 0.0f;
         for (int i = 0; i < x.getNonZeroNum(); i++) {
             int idx = x.getIndexAt(i);
