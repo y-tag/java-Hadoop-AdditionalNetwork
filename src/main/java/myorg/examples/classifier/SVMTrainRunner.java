@@ -45,7 +45,8 @@ public class SVMTrainRunner {
         FeatureVector datum = new FeatureVector();
         WeightVector weight = new WeightVector(dim);
 
-        long i = 0;
+        long i = 1;
+        int numIters = 2;
 
         WritableCacheWriter cacheWriter = new WritableCacheWriter(cacheName);
         while ((line = reader.readLine()) != null) {
@@ -60,10 +61,13 @@ public class SVMTrainRunner {
         cacheWriter.close();
 
         WritableCacheReader cacheReader = new WritableCacheReader(cacheName);
-        while (cacheReader.read(datum) > 0) {
-            float eta = 1.0f / (lambda * i);
-            SVMLearner.learnWithStochasticOneStep(datum, eta, lambda, weight);
-            i++;
+        for (int n = 1; n < numIters; n++) {
+            while (cacheReader.read(datum) > 0) {
+                float eta = 1.0f / (lambda * i);
+                SVMLearner.learnWithStochasticOneStep(datum, eta, lambda, weight);
+                i++;
+            }
+            cacheReader.reopen();
         }
         cacheReader.close();
 
