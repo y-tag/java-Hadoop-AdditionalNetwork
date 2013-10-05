@@ -3,6 +3,9 @@ package myorg.io;
 import java.io.IOException;
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import org.apache.hadoop.io.Writable;
 
@@ -17,6 +20,10 @@ public class WeightVector implements Writable {
         this.weightArray = new float[dim];
         this.scaleFactor = 1.0f;
         this.squaredNorm = 0.0f;
+    }
+
+    public WeightVector(String inString) {
+        setFromString(inString);
     }
 
     public float innerProduct(FeatureVector x) {
@@ -84,7 +91,7 @@ public class WeightVector implements Writable {
         return squaredNorm * scaleFactor * scaleFactor;
     }
 
-    public float getDimensions() {
+    public int getDimensions() {
         return weightArray.length;
     }
 
@@ -97,9 +104,8 @@ public class WeightVector implements Writable {
 
     public void setValue(int index, float value) {
         if (index < weightArray.length) {
-            return;
+            weightArray[index] = value;
         }
-        weightArray[index] = value;
     }
 
     @Override
@@ -154,7 +160,87 @@ public class WeightVector implements Writable {
             sb.append(weightArray[i]);
         }
 
+        sb.append(" # dim:" + Integer.toString(weightArray.length));
+
         return sb.toString();
     }
+
+    public void setFromString(String inString) {
+        this.weightArray = new float[0];
+        this.scaleFactor = 1.0f;
+        this.squaredNorm = 0.0f;
+
+        if (inString == null || "".equals(inString)) {
+            return;
+        }
+
+        int idx = inString.indexOf('#'); // comment part
+        String body = (idx > 0) ? inString.substring(0, idx).trim() : inString;
+        String comment = (idx > 0) ? inString.substring(idx + 1).trim() : "";
+
+        StringTokenizer st;
+
+        st = new StringTokenizer(body, " \t\r\n:");
+        if (! st.hasMoreTokens()) {
+            return;
+        }
+
+        Map<Integer, Float> tmpMap = new HashMap<Integer, Float>();
+        int maxFeatureId = -1;
+
+        while (st.hasMoreTokens()) {
+            String key = st.nextToken();
+
+            if (! st.hasMoreTokens()) {
+                break;
+            }
+
+            String val = st.nextToken();
+
+            try {
+                int k = Integer.parseInt(key);
+                float v = Float.parseFloat(val);
+                tmpMap.put(k, v);
+
+                if (k > maxFeatureId) {
+                    maxFeatureId = k;
+                }
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        int dim = -1;
+        if (! comment.equals("")) {
+            st = new StringTokenizer(comment, " \t\r\n:");
+            while (st.hasMoreTokens()) {
+                String key = st.nextToken();
+
+                if (! st.hasMoreTokens()) {
+                    break;
+                }
+
+                String val = st.nextToken();
+
+                if (key.equals("dim")) {
+                    try {
+                        dim = Integer.parseInt(val);
+                        break;
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            }
+        }
+        
+        if (maxFeatureId + 1 > dim) {
+            dim = maxFeatureId + 1;
+        }
+
+        this.weightArray = new float[dim];
+        for (Integer key : tmpMap.keySet()) {
+            weightArray[key.intValue()] = tmpMap.get(key).floatValue();
+        }
+
+    }
 }
+
 
