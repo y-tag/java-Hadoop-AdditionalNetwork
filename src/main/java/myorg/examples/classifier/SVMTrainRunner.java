@@ -1,12 +1,18 @@
 package myorg.examples.classifier;
 
 import java.io.IOException;
+import java.io.File;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
@@ -71,9 +77,29 @@ public class SVMTrainRunner {
         }
         cacheReader.close();
 
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightName);
-        weightWriter.write(weight);
+        
+        File cacheFile = new File(cacheName);
+        if (cacheFile.exists()) {
+            cacheFile.delete();
+        }
+
+
+        BufferedWriter weightWriter;
+        
+        if (weightName.endsWith(".gz")) {
+            weightWriter = new BufferedWriter(new OutputStreamWriter(
+                                        new GZIPOutputStream(new BufferedOutputStream(
+                                        new FileOutputStream(weightName)))));
+        } else {
+            weightWriter = new BufferedWriter(new OutputStreamWriter(
+                                        new BufferedOutputStream(
+                                        new FileOutputStream(weightName))));
+        }
+
+        weightWriter.write(weight.toString());
+        weightWriter.flush();
         weightWriter.close();
+
     }
 
 }
