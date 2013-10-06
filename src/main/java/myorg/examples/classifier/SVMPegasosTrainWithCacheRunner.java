@@ -19,9 +19,9 @@ import myorg.io.WeightVector;
 import myorg.io.WritableCacheReader;
 import myorg.io.WritableCacheWriter;
 import myorg.util.SVMLightFormatParser;
-import myorg.classifier.SVMLearner;
+import myorg.classifier.SVMPegasosLearner;
 
-public class SVMTrainRunner {
+public class SVMPegasosTrainWithCacheRunner {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
@@ -61,7 +61,7 @@ public class SVMTrainRunner {
             cacheWriter.write(datum);
 
             float eta = 1.0f / (lambda * i);
-            SVMLearner.learnWithStochasticOneStep(datum, eta, lambda, weight);
+            SVMPegasosLearner.learnWithStochasticOneStep(datum, eta, lambda, weight);
             i++;
         }
         cacheWriter.close();
@@ -70,7 +70,7 @@ public class SVMTrainRunner {
         for (int n = 1; n < numIters; n++) {
             while (cacheReader.read(datum) > 0) {
                 float eta = 1.0f / (lambda * i);
-                SVMLearner.learnWithStochasticOneStep(datum, eta, lambda, weight);
+                SVMPegasosLearner.learnWithStochasticOneStep(datum, eta, lambda, weight);
                 i++;
             }
             cacheReader.reopen();

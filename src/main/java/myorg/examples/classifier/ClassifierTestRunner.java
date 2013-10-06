@@ -19,7 +19,7 @@ import myorg.io.WeightVector;
 import myorg.io.WritableCacheReader;
 import myorg.io.WritableCacheWriter;
 import myorg.util.SVMLightFormatParser;
-import myorg.classifier.SVMLearner;
+import myorg.classifier.SVMPegasosLearner;
 
 public class ClassifierTestRunner {
 

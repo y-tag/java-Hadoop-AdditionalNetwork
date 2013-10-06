@@ -7,7 +7,7 @@ import java.util.Random;
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
 
-public class SVMLearner {
+public class SVMPegasosLearner {
 
     public static void learnWithStochasticLoop(
        List<FeatureVector> fVecList,
