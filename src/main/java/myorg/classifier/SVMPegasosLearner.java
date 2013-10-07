@@ -34,11 +34,12 @@ public class SVMPegasosLearner {
     public static void learnWithStochasticOneStep(
        FeatureVector fVec, float eta, float lambda, WeightVector w
     ) {
-        float y = (fVec.getLabel() > 0) ? 1.0f : -1.0f;
+        float y = (fVec.getLabel() > 0.0f) ? 1.0f : -1.0f;
         float ip = w.innerProduct(fVec);
 
-        float loss = 1.0f - y * ip;
+        w.scale(1.0f - eta * lambda);
 
+        float loss = 1.0f - y * ip;
         if (loss > 0.0f) {
             w.addVector(fVec, y * eta);
         }
