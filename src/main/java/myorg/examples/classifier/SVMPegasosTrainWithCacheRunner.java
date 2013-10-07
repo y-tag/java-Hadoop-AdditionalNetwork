@@ -31,7 +31,7 @@ public class SVMPegasosTrainWithCacheRunner {
         String fileName = args[0];
         String weightName = args[1];
 
-        float lambda = 0.1f;
+        float lambda = 1e-4f;
         String cacheName  = "cache";
 
         BufferedReader reader;
