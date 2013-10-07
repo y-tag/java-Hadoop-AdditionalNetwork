@@ -76,6 +76,14 @@ public class FeatureVector implements Writable {
         return name;
     }
 
+    public float getSquaredNorm() {
+        float squaredNorm = 0.0f;
+        for (int i = 0; i < values.length; i++) {
+            squaredNorm += values[i] * values[i];
+        }
+        return squaredNorm;
+    }
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeInt(indices.length);
