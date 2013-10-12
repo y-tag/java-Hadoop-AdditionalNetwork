@@ -21,7 +21,7 @@ import org.apache.hadoop.io.WritableUtils;
 import myorg.network.NodeInfoManager;
 import myorg.network.NodeInfo;
 
-public class AllReduceCoordinator<T extends Writable> implements Runnable {
+public class AllReduceCoordinator implements Runnable {
     private ServerSocket serverSocket;
     private NodeInfoManager nodeInfoManager;
 
