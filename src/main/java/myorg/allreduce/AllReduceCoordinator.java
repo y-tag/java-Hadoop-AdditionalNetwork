@@ -23,11 +23,10 @@ import myorg.network.NodeInfo;
 
 public class AllReduceCoordinator<T extends Writable> implements Runnable {
     private ServerSocket serverSocket;
-    private HashMap<String, LinkedList<NodeInfo>> nodeInfoQueueMap;
     private NodeInfoManager nodeInfoManager;
 
     public enum Command {
-        registerListingInfo, requestParentInfo, connectionClosed
+        registerNodeInfo, requestNodeInfo, connectionClosed
     }
 
     public class Worker implements Runnable {
@@ -55,7 +54,7 @@ public class AllReduceCoordinator<T extends Writable> implements Runnable {
                     String groupName = Text.readString(inStream);
 
                     switch (command) {
-                        case registerListingInfo:
+                        case registerNodeInfo:
                             // receive listening info from node
                             String hostName = this.socket.getInetAddress().getHostName();
                             IntWritable hostPortWritable = new IntWritable();
@@ -71,7 +70,7 @@ public class AllReduceCoordinator<T extends Writable> implements Runnable {
                             System.err.println(hostName + ":" + Integer.toString(hostPort));
                             break;
 
-                        case requestParentInfo:
+                        case requestNodeInfo:
                             String parentHostName = "";
                             int parentHostPort = -1;
 

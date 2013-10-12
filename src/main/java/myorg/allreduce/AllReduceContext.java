@@ -118,7 +118,7 @@ public class AllReduceContext {
         // send command and groupName
         WritableUtils.writeEnum(
                 coordinatorInfo.getDataOutputStream(),
-                AllReduceCoordinator.Command.registerListingInfo
+                AllReduceCoordinator.Command.registerNodeInfo
         );
         Text.writeString(coordinatorInfo.getDataOutputStream(), groupName);
         coordinatorInfo.getDataOutputStream().flush();
@@ -137,7 +137,7 @@ public class AllReduceContext {
             // send command and groupName
             WritableUtils.writeEnum(
                     coordinatorInfo.getDataOutputStream(),
-                    AllReduceCoordinator.Command.requestParentInfo
+                    AllReduceCoordinator.Command.requestNodeInfo
             );
             Text.writeString(coordinatorInfo.getDataOutputStream(), groupName);
             coordinatorInfo.getDataOutputStream().flush();
