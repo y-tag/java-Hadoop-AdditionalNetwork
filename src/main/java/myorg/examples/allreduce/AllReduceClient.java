@@ -16,31 +16,18 @@ import org.apache.hadoop.io.Text;
 import myorg.allreduce.AllReducer;
 import myorg.allreduce.AllReduceContext;
 
-public class AllReduceClient extends AllReducer<IntWritable> implements Runnable {
+public class AllReduceClient implements Runnable {
     private AllReduceContext context;
+    private AllReducer<IntWritable> allreducer;
 
     public AllReduceClient(
             String coordinatorHostName, int coordinatorHostPort) throws IOException {
                 this.context = new AllReduceContext(coordinatorHostName, coordinatorHostPort, "AllReduceClient");
+                this.allreducer = new IntWritableSumAllReducer();
     }
 
     public void close() throws IOException {
         context.close();
-    }
-
-    @Override
-    protected void reduce(AllReduceContext context, IntWritable writable) throws IOException {
-        for (DataInputStream childIn : context.getChildrenDataInputStreams()) {
-            IntWritable w = new IntWritable();
-            w.readFields(childIn);
-            int sum = writable.get() + w.get();
-            writable.set(sum);
-        }
-
-        if (! context.isRoot()) {
-            writable.write(context.getParentDataOutputStream());
-            context.getParentDataOutputStream().flush();
-        }
     }
 
     @Override
@@ -53,7 +40,7 @@ public class AllReduceClient extends AllReducer<IntWritable> implements Runnable
         IntWritable w = new IntWritable(1);
         for (int i = 0; i < 5; i++) {
             try {
-                allreduce(context, w);
+                allreducer.allreduce(context, w);
                 System.out.println(w.get());
             } catch (IOException e) {
                 break;
