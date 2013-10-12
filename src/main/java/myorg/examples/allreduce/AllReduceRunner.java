@@ -45,7 +45,7 @@ public class AllReduceRunner {
         Job job = new Job(conf, "AllReduce sample");
         job.setJarByClass(AllReduceRunner.class);
         job.setMapperClass(AllReduceMapper.class);
-        job.setReducerClass(AllReduceReducer.class);
+        job.setReducerClass(Reducer.class);
 
         job.setNumReduceTasks(1);
 
