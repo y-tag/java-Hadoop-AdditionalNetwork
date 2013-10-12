@@ -11,9 +11,9 @@ import org.apache.hadoop.mapreduce.Mapper;
 import myorg.allreduce.AllReducer;
 import myorg.allreduce.AllReduceContext;
 
-public class AllReduceMapper extends Mapper<Object, Text, Text, Text> {
-    public static String SERVER_NAME_CONFNAME = "myorg.examples.allreduce.AllReduceMapper.serverName";
-    public static String SERVER_PORT_CONFNAME = "myorg.examples.allreduce.AllReduceMapper.serverPort";
+public class IntWritableSumMapper extends Mapper<Object, Text, Text, Text> {
+    public static String SERVER_NAME_CONFNAME = "myorg.examples.allreduce.IntWritableSumMapper.serverName";
+    public static String SERVER_PORT_CONFNAME = "myorg.examples.allreduce.IntWritableSumMapper.serverPort";
 
     private AllReduceContext allreduceContext;
     private AllReducer<IntWritable> allreducer;

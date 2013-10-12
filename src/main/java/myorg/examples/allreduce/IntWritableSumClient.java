@@ -16,13 +16,13 @@ import org.apache.hadoop.io.Text;
 import myorg.allreduce.AllReducer;
 import myorg.allreduce.AllReduceContext;
 
-public class AllReduceClient implements Runnable {
+public class IntWritableSumClient implements Runnable {
     private AllReduceContext context;
     private AllReducer<IntWritable> allreducer;
 
-    public AllReduceClient(
+    public IntWritableSumClient(
             String coordinatorHostName, int coordinatorHostPort) throws IOException {
-                this.context = new AllReduceContext(coordinatorHostName, coordinatorHostPort, "AllReduceClient");
+                this.context = new AllReduceContext(coordinatorHostName, coordinatorHostPort, "IntWritableSumClient");
                 this.allreducer = new IntWritableSumAllReducer();
     }
 
@@ -57,7 +57,7 @@ public class AllReduceClient implements Runnable {
         int port = Integer.parseInt(args[1]);
 
         for (int i = 0; i < 5; i++) {
-            AllReduceClient ar = new AllReduceClient(host, port);
+            IntWritableSumClient ar = new IntWritableSumClient(host, port);
 
             Thread thread = new Thread(ar);
             thread.start();

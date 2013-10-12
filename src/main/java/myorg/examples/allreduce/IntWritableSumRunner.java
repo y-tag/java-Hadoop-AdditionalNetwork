@@ -17,7 +17,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 import myorg.network.NodeInfoIndexServer;
 
-public class AllReduceRunner {
+public class IntWritableSumRunner {
     
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
@@ -39,12 +39,12 @@ public class AllReduceRunner {
         thread.setDaemon(true); // use daemon thread
         thread.start();
 
-        conf.set(AllReduceMapper.SERVER_NAME_CONFNAME, serverName);
-        conf.setInt(AllReduceMapper.SERVER_PORT_CONFNAME, serverPort);
+        conf.set(IntWritableSumMapper.SERVER_NAME_CONFNAME, serverName);
+        conf.setInt(IntWritableSumMapper.SERVER_PORT_CONFNAME, serverPort);
 
         Job job = new Job(conf, "AllReduce sample");
-        job.setJarByClass(AllReduceRunner.class);
-        job.setMapperClass(AllReduceMapper.class);
+        job.setJarByClass(IntWritableSumRunner.class);
+        job.setMapperClass(IntWritableSumMapper.class);
         job.setReducerClass(Reducer.class);
 
         job.setNumReduceTasks(1);
