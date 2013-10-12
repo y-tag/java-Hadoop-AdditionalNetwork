@@ -17,6 +17,8 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableUtils;
 
+import myorg.network.NodeInfoIndexServer;
+
 public class AllReduceContext {
     protected ConnectionListener listener;
     protected ConnectionInfo coordinatorInfo;
@@ -118,7 +120,7 @@ public class AllReduceContext {
         // send command and groupName
         WritableUtils.writeEnum(
                 coordinatorInfo.getDataOutputStream(),
-                AllReduceCoordinator.Command.registerNodeInfo
+                NodeInfoIndexServer.Command.registerNodeInfo
         );
         Text.writeString(coordinatorInfo.getDataOutputStream(), groupName);
         coordinatorInfo.getDataOutputStream().flush();
@@ -137,7 +139,7 @@ public class AllReduceContext {
             // send command and groupName
             WritableUtils.writeEnum(
                     coordinatorInfo.getDataOutputStream(),
-                    AllReduceCoordinator.Command.requestNodeInfo
+                    NodeInfoIndexServer.Command.requestNodeInfo
             );
             Text.writeString(coordinatorInfo.getDataOutputStream(), groupName);
             coordinatorInfo.getDataOutputStream().flush();
@@ -179,7 +181,7 @@ public class AllReduceContext {
         // send command and dummy groupName
         WritableUtils.writeEnum(
                 coordinatorInfo.getDataOutputStream(),
-                AllReduceCoordinator.Command.connectionClosed
+                NodeInfoIndexServer.Command.connectionClosed
         );
         Text.writeString(coordinatorInfo.getDataOutputStream(), "");
         coordinatorInfo.getDataOutputStream().flush();

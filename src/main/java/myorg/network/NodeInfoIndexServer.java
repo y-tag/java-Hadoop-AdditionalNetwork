@@ -1,4 +1,4 @@
-package myorg.allreduce;
+package myorg.network;
 
 import java.io.IOException;
 import java.io.EOFException;
@@ -21,7 +21,7 @@ import org.apache.hadoop.io.WritableUtils;
 import myorg.network.NodeInfoManager;
 import myorg.network.NodeInfo;
 
-public class AllReduceCoordinator implements Runnable {
+public class NodeInfoIndexServer implements Runnable {
     private ServerSocket serverSocket;
     private NodeInfoManager nodeInfoManager;
 
@@ -102,7 +102,7 @@ public class AllReduceCoordinator implements Runnable {
         }
     }
 
-    public AllReduceCoordinator(int listenPort) throws IOException {
+    public NodeInfoIndexServer(int listenPort) throws IOException {
         this.serverSocket = new ServerSocket(listenPort);
         this.nodeInfoManager = new NodeInfoManager(2);
     }

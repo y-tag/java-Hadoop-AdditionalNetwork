@@ -1,6 +1,6 @@
 package myorg.examples.allreduce;
 
-import myorg.allreduce.AllReduceCoordinator;
+import myorg.network.NodeInfoIndexServer;
 
 public class AllReduceServer {
 
@@ -11,8 +11,8 @@ public class AllReduceServer {
         }
         int port = Integer.parseInt(args[0]);
 
-        AllReduceCoordinator coordinator = new AllReduceCoordinator(port);
-        coordinator.run();
+        NodeInfoIndexServer indexServer = new NodeInfoIndexServer(port);
+        indexServer.run();
     }
 }
 

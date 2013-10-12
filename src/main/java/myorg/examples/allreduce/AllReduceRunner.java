@@ -15,7 +15,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-import myorg.allreduce.AllReduceCoordinator;
+import myorg.network.NodeInfoIndexServer;
 
 public class AllReduceRunner {
     
@@ -34,8 +34,8 @@ public class AllReduceRunner {
 
         String serverName = InetAddress.getLocalHost().getHostName();
 
-        AllReduceCoordinator coordinator = new AllReduceCoordinator(serverPort);
-        Thread thread = new Thread(coordinator);
+        NodeInfoIndexServer indexServer = new NodeInfoIndexServer(serverPort);
+        Thread thread = new Thread(indexServer);
         thread.setDaemon(true); // use daemon thread
         thread.start();
 
