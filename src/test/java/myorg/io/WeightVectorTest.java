@@ -88,6 +88,61 @@ public class WeightVectorTest {
             assertEquals(w1.getValue(i) * scaleFactor, w3.getValue(i), epsilon);
         }
     }
+
+    @Test
+    public void testAddVector() throws IOException {
+
+        int dim1 = 16 * 1024;
+        int dim2 = 32 * 1024;
+        double epsilon = 1e-5;
+        Random random = new Random();
+
+        WeightVector w1 = new WeightVector(dim1);
+        WeightVector w2 = new WeightVector(dim1);
+        WeightVector w3 = new WeightVector(dim2);
+
+        for (int i = 0; i < 1000; i++) {
+            int k = Math.abs(random.nextInt()) % dim1;
+            float v = random.nextFloat();
+            w1.setValue(k, v);
+
+            k = Math.abs(random.nextInt()) % dim1;
+            v = random.nextFloat();
+            w2.setValue(k, v);
+
+            k = Math.abs(random.nextInt()) % dim2;
+            v = random.nextFloat();
+            w3.setValue(k, v);
+        }
+
+        WeightVector w1c = new WeightVector(w1.toString());
+        WeightVector w2c = new WeightVector(w2.toString());
+
+        float xScale = random.nextFloat(); 
+        w1.addVector(w2, xScale);
+
+        assertEquals(dim1, w1.getDimensions());
+
+        for (int i = 0; i < w1.getDimensions(); i++) {
+            float v = w1c.getValue(i) + xScale * w2.getValue(i);
+            assertEquals(w1.getValue(i), v, epsilon);
+        }
+
+        assertEquals(dim1, w2.getDimensions());
+
+        w2.addVector(w3, xScale);
+
+        assertEquals(dim2, w2.getDimensions());
+
+        for (int i = 0; i < w2.getDimensions(); i++) {
+            float v = xScale * w3.getValue(i);
+            if (i < w2c.getDimensions()) {
+                v += w2c.getValue(i);
+            }
+            assertEquals(w2.getValue(i), v, epsilon);
+        }
+
+    }
 }
 
 
