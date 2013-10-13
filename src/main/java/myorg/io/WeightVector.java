@@ -99,12 +99,12 @@ public class WeightVector implements Writable {
         if (index >= weightArray.length) {
             return 0.0f;
         }
-        return weightArray[index];
+        return weightArray[index] * scaleFactor;
     }
 
     public void setValue(int index, float value) {
         if (index < weightArray.length) {
-            weightArray[index] = value;
+            weightArray[index] = value / scaleFactor;
         }
     }
 

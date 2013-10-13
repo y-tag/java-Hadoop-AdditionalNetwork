@@ -38,7 +38,7 @@ public class WeightVectorTest {
     @Test
     public void testToString() throws IOException {
 
-        int dim = 1024 * 1024;
+        int dim = 16 * 1024;
         double epsilon = 1e-5;
         Random random = new Random();
 
@@ -56,6 +56,36 @@ public class WeightVectorTest {
 
         for (int i = 0; i < w2.getDimensions(); i++) {
             assertEquals(w1.getValue(i), w2.getValue(i), epsilon);
+        }
+    }
+
+    @Test
+    public void testScale() throws IOException {
+
+        int dim = 16 * 1024;
+        double epsilon = 1e-5;
+        Random random = new Random();
+
+        WeightVector w1 = new WeightVector(dim);
+        WeightVector w2 = new WeightVector(dim);
+        WeightVector w3 = new WeightVector(dim);
+        float scaleFactor = random.nextFloat();
+
+        for (int i = 0; i < 1000; i++) {
+            int k = Math.abs(random.nextInt()) % dim;
+            float v = random.nextFloat();
+            w1.setValue(k, v);
+            w2.setValue(k, v * scaleFactor);
+            w3.setValue(k, v);
+        }
+
+        w3.scale(scaleFactor);
+
+        assertEquals(w1.getDimensions(), w2.getDimensions());
+
+        for (int i = 0; i < w2.getDimensions(); i++) {
+            assertEquals(w1.getValue(i) * scaleFactor, w2.getValue(i), epsilon);
+            assertEquals(w1.getValue(i) * scaleFactor, w3.getValue(i), epsilon);
         }
     }
 }
