@@ -1,19 +1,13 @@
 package myorg.network;
 
 import java.io.IOException;
-import java.io.EOFException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.net.ServerSocket;
-import java.net.InetSocketAddress;
-import java.util.Queue;
-import java.util.LinkedList;
-import java.util.HashMap;
 
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableUtils;

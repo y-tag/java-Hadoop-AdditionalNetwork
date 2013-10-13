@@ -1,7 +1,6 @@
 package myorg.allreduce;
 
 import java.io.IOException;
-import java.io.EOFException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;

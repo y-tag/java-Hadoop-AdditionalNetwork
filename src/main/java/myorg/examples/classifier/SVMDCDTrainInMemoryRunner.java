@@ -1,10 +1,7 @@
 package myorg.examples.classifier;
 
-import java.io.IOException;
-import java.io.File;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -17,8 +14,6 @@ import java.util.ArrayList;
 
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
-import myorg.io.WritableCacheReader;
-import myorg.io.WritableCacheWriter;
 import myorg.util.SVMLightFormatParser;
 import myorg.classifier.SVMDCDLearner;
 
