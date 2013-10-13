@@ -16,6 +16,10 @@ public class WeightVector implements Writable {
     protected float scaleFactor = 1.0f;
     protected float squaredNorm = 0.0f;
 
+    public WeightVector() {
+        this(0);
+    }
+
     public WeightVector(int dim) {
         this.weightArray = new float[dim];
         this.scaleFactor = 1.0f;
