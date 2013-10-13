@@ -32,13 +32,13 @@ public class SVMPegasosTrainClient extends Thread {
     private int startIndex;
     private int endIndex;
     private int numIters;
-    private int numEpocs;
+    private int numEpochs;
     private float lambda;
     private WeightVector weight;
 
     public SVMPegasosTrainClient(
             ArrayList<FeatureVector> data, int startIndex, int endIndex,
-            int numIters, int numEpocs, float lambda,
+            int numIters, int numEpochs, float lambda,
             String host, int port, WeightVector weight) throws IOException {
         this.allreducer = new WeightVectorWithCountSumAllReducer();
         this.context = new AllReduceContext(host, port, "SVMPegasosTrainClient");
@@ -46,7 +46,7 @@ public class SVMPegasosTrainClient extends Thread {
         this.startIndex = startIndex;
         this.endIndex = endIndex;
         this.numIters = numIters;
-        this.numEpocs = numEpocs;
+        this.numEpochs = numEpochs;
         this.lambda = lambda;
         this.weight = weight;
     }
@@ -57,7 +57,7 @@ public class SVMPegasosTrainClient extends Thread {
         FeatureVector datum;
         Random rnd = new Random();
 
-        for (int epoc = 0; epoc < numEpocs; epoc++) {
+        for (int epoch = 0; epoch < numEpochs; epoch++) {
             for (int iter = 0; iter < numIters; iter++) {
                 int index = rnd.nextInt(endIndex - startIndex) + startIndex;
                 datum = data.get(index);
@@ -116,8 +116,8 @@ public class SVMPegasosTrainClient extends Thread {
         int numWorkers = 5;
         int dim = 1 << 24;
         float lambda = 1e-4f;
-        int numEpocs = 10;
-        int numIters = 1000000 / (numWorkers * numEpocs);
+        int numEpochs = 10;
+        int numIters = 1000000 / (numWorkers * numEpochs);
 
         ArrayList<WeightVector> weightList = new ArrayList<WeightVector>();
         ArrayList<SVMPegasosTrainClient> workerList = new ArrayList<SVMPegasosTrainClient>();
@@ -133,7 +133,7 @@ public class SVMPegasosTrainClient extends Thread {
 
             SVMPegasosTrainClient worker
                     = new SVMPegasosTrainClient(data, startIndex, endIndex,
-                                                        numIters, numEpocs, lambda,
+                                                        numIters, numEpochs, lambda,
                                                         host, port, weightList.get(i));
             worker.start();
             workerList.add(worker);
