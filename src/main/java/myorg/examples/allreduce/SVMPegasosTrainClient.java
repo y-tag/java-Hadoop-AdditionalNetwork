@@ -25,7 +25,7 @@ import myorg.classifier.SVMPegasosLearner;
 import myorg.allreduce.AllReducer;
 import myorg.allreduce.AllReduceContext;
 
-public class SVMPegasosTrainInMemoryClient extends Thread {
+public class SVMPegasosTrainClient extends Thread {
     private AllReducer<WeightVectorWithCount> allreducer;
     private AllReduceContext context;
     private ArrayList<FeatureVector> data;
@@ -36,12 +36,12 @@ public class SVMPegasosTrainInMemoryClient extends Thread {
     private float lambda;
     private WeightVector weight;
 
-    public SVMPegasosTrainInMemoryClient(
+    public SVMPegasosTrainClient(
             ArrayList<FeatureVector> data, int startIndex, int endIndex,
             int numIters, int numEpocs, float lambda,
             String host, int port, WeightVector weight) throws IOException {
         this.allreducer = new WeightVectorWithCountSumAllReducer();
-        this.context = new AllReduceContext(host, port, "SVMPegasosTrainInMemoryClient");
+        this.context = new AllReduceContext(host, port, "SVMPegasosTrainClient");
         this.data = data;
         this.startIndex = startIndex;
         this.endIndex = endIndex;
@@ -120,7 +120,7 @@ public class SVMPegasosTrainInMemoryClient extends Thread {
         int numIters = 1000000 / (numWorkers * numEpocs);
 
         ArrayList<WeightVector> weightList = new ArrayList<WeightVector>();
-        ArrayList<SVMPegasosTrainInMemoryClient> workerList = new ArrayList<SVMPegasosTrainInMemoryClient>();
+        ArrayList<SVMPegasosTrainClient> workerList = new ArrayList<SVMPegasosTrainClient>();
 
         for (int i = 0; i < numWorkers; i++) {
             WeightVector weight = new WeightVector(dim);
@@ -131,8 +131,8 @@ public class SVMPegasosTrainInMemoryClient extends Thread {
             int startIndex = i * d + ((i < m) ? i : m);
             int endIndex   = startIndex + d + ((i < m) ? 1 : 0);
 
-            SVMPegasosTrainInMemoryClient worker
-                    = new SVMPegasosTrainInMemoryClient(data, startIndex, endIndex,
+            SVMPegasosTrainClient worker
+                    = new SVMPegasosTrainClient(data, startIndex, endIndex,
                                                         numIters, numEpocs, lambda,
                                                         host, port, weightList.get(i));
             worker.start();
