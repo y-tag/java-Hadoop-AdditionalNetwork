@@ -10,7 +10,7 @@ import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
 import myorg.util.SVMLightFormatParser;
 
-public class ClassifierTestRunner {
+public class BinaryClassifierTestRunner {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
