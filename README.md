@@ -4,7 +4,8 @@ java-Hadoop-AdditionalNetwork
 This library is a simple package for solving regularized linear classification.
 This currently supports:
 - Pegasos SVM (L2-regulalized L1-loss linear SVM for binary classification)
-- Dual Coordinate Descent SVM (L2-regulalized L1/L2-loss linear SVM for binary classiffication)
+- SVM + Dual Coordinate Descent (L2-regulalized L1/L2-loss linear SVM for binary classiffication)
+- Maximum Entropy + Stochastic Gradient Descent (L2-regulalized multi-class logistic regression)
 
 For parallel learning using Hadoop Map Reduce, AllReduce is implemented.
 
