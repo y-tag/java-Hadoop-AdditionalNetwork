@@ -14,6 +14,7 @@ import org.apache.hadoop.io.Text;
 public class FeatureVector implements Writable {
     protected int[] indices;
     protected float[] values;
+    protected float squaredNorm;
     protected float label;
     protected String name;
 
@@ -24,6 +25,7 @@ public class FeatureVector implements Writable {
     public void clear() {
         indices = new int[0];
         values = new float[0];
+        squaredNorm = 0.0f;
         label = 0.0f;
         name = "";
     }
@@ -41,10 +43,12 @@ public class FeatureVector implements Writable {
         int size = idxList.size();
         indices = new int[size];
         values = new float[size];
+        squaredNorm = 0.0f;
 
         for (int i = 0; i < size; i++) {
             indices[i] = idxList.get(i);
             values[i] = map.get(idxList.get(i));
+            squaredNorm += values[i] * values[i];
         }
     }
 
@@ -77,10 +81,6 @@ public class FeatureVector implements Writable {
     }
 
     public float getSquaredNorm() {
-        float squaredNorm = 0.0f;
-        for (int i = 0; i < values.length; i++) {
-            squaredNorm += values[i] * values[i];
-        }
         return squaredNorm;
     }
 
@@ -91,6 +91,7 @@ public class FeatureVector implements Writable {
             out.writeInt(indices[i]);
             out.writeFloat(values[i]);
         }
+        out.writeFloat(squaredNorm);
         out.writeFloat(label);
         Text.writeString(out, name);
     }
@@ -104,6 +105,7 @@ public class FeatureVector implements Writable {
             indices[i] = in.readInt();
             values[i] = in.readFloat();
         }
+        squaredNorm = in.readFloat();
         label = in.readFloat();
         name = Text.readString(in);
     }
