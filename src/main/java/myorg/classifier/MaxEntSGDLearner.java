@@ -11,7 +11,7 @@ public class MaxEntSGDLearner {
 
     public static void learnWithStochasticLoop(
        List<FeatureVector> fVecList,
-       float eta, float lambda, int numIters, WeightVector[] wMatrix
+       float eta0, float lambda, int numIters, WeightVector[] wMatrix
     ) {
         if (wMatrix == null) { return; }
         for (int i = 0; i < wMatrix.length; i++) {
@@ -23,6 +23,8 @@ public class MaxEntSGDLearner {
         Random rnd = new Random(1000);
 
         for (int i = 1; i <= numIters; i++) {
+            float eta = eta0 / (1.0f + eta0 * lambda * i);
+
             int idx = rnd.nextInt(dataSize);
             FeatureVector fVec = fVecList.get(idx);
 

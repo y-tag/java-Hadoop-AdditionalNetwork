@@ -28,7 +28,7 @@ public class MaxEntSGDTrainInMemoryRunner {
         String weightName = args[1];
 
         int dim = 1 << 16;
-        float eta = 1e-3f;
+        float eta0 = 1e-2f;
         float lambda = 1e-4f;
         int numIters = 1000000;
 
@@ -64,7 +64,7 @@ public class MaxEntSGDTrainInMemoryRunner {
             weightMatrix[i] = new WeightVector(dim);
         }
 
-        MaxEntSGDLearner.learnWithStochasticLoop(data, eta, lambda, numIters, weightMatrix);
+        MaxEntSGDLearner.learnWithStochasticLoop(data, eta0, lambda, numIters, weightMatrix);
         
         BufferedWriter weightWriter;
         

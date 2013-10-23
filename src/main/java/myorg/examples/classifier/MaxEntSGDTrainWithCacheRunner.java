@@ -31,7 +31,7 @@ public class MaxEntSGDTrainWithCacheRunner {
         String weightName = args[1];
 
         int dim = 1 << 16;
-        float eta = 1e-3f;
+        float eta0 = 1e-2f;
         float lambda = 1e-4f;
         int numEpochs= 10;
         String cacheName  = "cache";
@@ -64,14 +64,17 @@ public class MaxEntSGDTrainWithCacheRunner {
         cacheWriter.close();
 
         WeightVector[] weightMatrix = new WeightVector[maxLabel + 1];
-        for (int i = 0; i < weightMatrix.length; i++) {
-            weightMatrix[i] = new WeightVector(dim);
+        for (int r = 0; r < weightMatrix.length; r++) {
+            weightMatrix[r] = new WeightVector(dim);
         }
 
+        int i = 1;
         WritableCacheReader cacheReader = new WritableCacheReader(cacheName);
         for (int n = 0; n < numEpochs; n++) {
             while (cacheReader.read(datum) > 0) {
+                float eta = eta0 / (1.0f + eta0 * lambda * i);
                 MaxEntSGDLearner.learnWithStochasticOneStep(datum, eta, lambda, weightMatrix);
+                i++;
             }
             cacheReader.reopen();
         }
@@ -94,8 +97,8 @@ public class MaxEntSGDTrainWithCacheRunner {
                                         new FileOutputStream(weightName))));
         }
 
-        for (int i = 0; i < weightMatrix.length; i++) {
-            weightWriter.write(weightMatrix[i].toString() + "\n");
+        for (int r = 0; r < weightMatrix.length; r++) {
+            weightWriter.write(weightMatrix[r].toString() + "\n");
         }
         weightWriter.flush();
         weightWriter.close();
