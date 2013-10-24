@@ -21,12 +21,14 @@ public class SVMInvariantUpdateLearner {
 
         Random rnd = new Random(1000);
 
+        float t = 1.0f;
         for (int i = 1; i <= numIters; i++) {
-            float eta = eta0 / (1.0f + eta0 * lambda * i);
             int idx = rnd.nextInt(dataSize);
             FeatureVector fVec = fVecList.get(idx);
+            float eta = (float)((Math.log(1.0f + eta0 * lambda * (t + 1.0f)) - Math.log(1.0f + eta0 * lambda * t)) / lambda);
 
             learnWithStochasticOneStep(fVec, eta, lambda, w);
+            t += 1.0f;
         }
     }
 
@@ -44,13 +46,15 @@ public class SVMInvariantUpdateLearner {
 
         Random rnd = new Random(1000);
 
+        float t = 1.0f;
         for (int i = 1; i <= numIters; i++) {
-            float eta = eta0 / (1.0f + eta0 * lambda * i);
             int idx = rnd.nextInt(dataSize);
-            FeatureVector fVec = fVecList.get(idx);
             float importance = importanceList.get(idx).floatValue();
+            FeatureVector fVec = fVecList.get(idx);
+            float eta = (float)((Math.log(1.0f + eta0 * lambda * (t + importance)) - Math.log(1.0f + eta0 * lambda * t)) / lambda);
 
             learnWithStochasticOneStep(fVec, importance, eta, lambda, w);
+            t += importance;
         }
     }
 
