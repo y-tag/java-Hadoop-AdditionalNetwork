@@ -12,6 +12,7 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.Text;
 
 public class FeatureVector implements Writable {
+    protected int dim;
     protected int[] indices;
     protected float[] values;
     protected float squaredNorm;
@@ -23,6 +24,7 @@ public class FeatureVector implements Writable {
     }
 
     public void clear() {
+        dim = 0;
         indices = new int[0];
         values = new float[0];
         squaredNorm = 0.0f;
@@ -41,8 +43,11 @@ public class FeatureVector implements Writable {
         Collections.sort(idxList);
 
         int size = idxList.size();
-        indices = new int[size];
-        values = new float[size];
+        if (size > indices.length) {
+            indices = new int[size];
+            values = new float[size];
+        }
+        dim = size;
         squaredNorm = 0.0f;
 
         for (int i = 0; i < size; i++) {
@@ -61,7 +66,7 @@ public class FeatureVector implements Writable {
     }
 
     public int getNonZeroNum() {
-        return indices.length;
+        return dim;
     }
 
     public int getIndexAt(int i) {
@@ -86,8 +91,8 @@ public class FeatureVector implements Writable {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeInt(indices.length);
-        for (int i = 0; i < indices.length; i++) {
+        out.writeInt(dim);
+        for (int i = 0; i < dim; i++) {
             out.writeInt(indices[i]);
             out.writeFloat(values[i]);
         }
@@ -98,9 +103,12 @@ public class FeatureVector implements Writable {
 
     @Override
     public void readFields(DataInput in) throws IOException {
-        int dim = in.readInt();
-        indices = new int[dim];
-        values = new float[dim];
+        int size = in.readInt();
+        if (size > indices.length) {
+            indices = new int[size];
+            values = new float[size];
+        }
+        dim = size;
         for (int i = 0; i < dim; i++) {
             indices[i] = in.readInt();
             values[i] = in.readFloat();
@@ -116,7 +124,7 @@ public class FeatureVector implements Writable {
         StringBuffer sb = new StringBuffer();
         sb.append(Float.toString(label));
 
-        for (int i = 0; i < indices.length; i++) {
+        for (int i = 0; i < dim; i++) {
             if (sb.length() > 0) {
                 sb.append(' ');
             }

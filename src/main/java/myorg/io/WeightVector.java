@@ -12,6 +12,7 @@ import org.apache.hadoop.io.Writable;
 import myorg.io.FeatureVector;
 
 public class WeightVector implements Writable {
+    protected int dim = 0;
     protected float[] weightArray = null;
     protected float scaleFactor = 1.0f;
     protected float squaredNorm = 0.0f;
@@ -21,6 +22,7 @@ public class WeightVector implements Writable {
     }
 
     public WeightVector(int dim) {
+        this.dim = dim;
         this.weightArray = new float[dim];
         this.scaleFactor = 1.0f;
         this.squaredNorm = 0.0f;
@@ -44,7 +46,7 @@ public class WeightVector implements Writable {
             int idx = x.getIndexAt(i);
             float val = x.getValueAt(i);
 
-            if (idx >= weightArray.length) {
+            if (idx >= dim) {
                 continue;
             }
 
@@ -64,8 +66,8 @@ public class WeightVector implements Writable {
             int idx = x.getIndexAt(i);
             float val = x.getValueAt(i);
 
-            if (idx >= weightArray.length) {
-                System.err.println("dimention over in addVector: " + idx + " >= " + weightArray.length);
+            if (idx >= dim) {
+                System.err.println("dimention over in addVector: " + idx + " >= " + dim);
                 continue;
             }
 
@@ -82,12 +84,13 @@ public class WeightVector implements Writable {
     public void addVector(WeightVector x, float xScale) {
         float s = xScale / scaleFactor;
 
-        if (x.getDimensions() > weightArray.length) {
+        if (x.getDimensions() > dim) {
             float[] newArray = new float[x.getDimensions()];
-            for (int i = 0; i < weightArray.length; i++) {
+            for (int i = 0; i < dim; i++) {
                 newArray[i] = weightArray[i];
             }
             weightArray = newArray;
+            dim = x.getDimensions();
         }
 
         for (int i = 0; i < x.getDimensions(); i++) {
@@ -106,7 +109,7 @@ public class WeightVector implements Writable {
 
     private void rescale() {
         squaredNorm = 0.0f;
-        for (int i = 0; i < weightArray.length; i++) {
+        for (int i = 0; i < dim; i++) {
             weightArray[i] *= scaleFactor;
             squaredNorm += weightArray[i] * weightArray[i];
         }
@@ -118,18 +121,18 @@ public class WeightVector implements Writable {
     }
 
     public int getDimensions() {
-        return weightArray.length;
+        return dim;
     }
 
     public float getValue(int index) {
-        if (index >= weightArray.length) {
+        if (index >= dim) {
             return 0.0f;
         }
         return weightArray[index] * scaleFactor;
     }
 
     public void setValue(int index, float value) {
-        if (index < weightArray.length) {
+        if (index < dim) {
             weightArray[index] = value / scaleFactor;
         }
     }
@@ -137,15 +140,15 @@ public class WeightVector implements Writable {
     @Override
     public void write(DataOutput out) throws IOException {
         rescale();
-        out.writeInt(weightArray.length);
+        out.writeInt(dim);
         int nonzeroNum = 0;
-        for (int i = 0; i < weightArray.length; i++) {
+        for (int i = 0; i < dim; i++) {
             if (weightArray[i] != 0.0f) {
                 nonzeroNum++;
             }
         }
         out.writeInt(nonzeroNum);
-        for (int i = 0; i < weightArray.length; i++) {
+        for (int i = 0; i < dim; i++) {
             if (weightArray[i] != 0.0f) {
                 out.writeInt(i);
                 out.writeFloat(weightArray[i]);
@@ -157,8 +160,11 @@ public class WeightVector implements Writable {
 
     @Override
     public void readFields(DataInput in) throws IOException {
-        int dim = in.readInt();
-        weightArray = new float[dim];
+        int size = in.readInt();
+        if (size > weightArray.length) {
+            weightArray = new float[size];
+        }
+        dim = size;
         int nonzeroNum = in.readInt();
         for (int i = 0; i < nonzeroNum; i++) {
             int j = in.readInt();
@@ -173,7 +179,7 @@ public class WeightVector implements Writable {
         rescale();
 
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < weightArray.length; i++) {
+        for (int i = 0; i < dim; i++) {
             if (weightArray[i] == 0.0f) {
                 continue;
             }
@@ -186,7 +192,7 @@ public class WeightVector implements Writable {
             sb.append(weightArray[i]);
         }
 
-        sb.append(" # dim:" + Integer.toString(weightArray.length));
+        sb.append(" # dim:" + Integer.toString(dim));
 
         return sb.toString();
     }
@@ -235,7 +241,7 @@ public class WeightVector implements Writable {
             }
         }
 
-        int dim = -1;
+        dim = -1;
         if (! comment.equals("")) {
             st = new StringTokenizer(comment, " \t\r\n:");
             while (st.hasMoreTokens()) {
