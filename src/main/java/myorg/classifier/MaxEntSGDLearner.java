@@ -20,7 +20,7 @@ public class MaxEntSGDLearner {
 
         int dataSize = fVecList.size();
 
-        Random rnd = new Random(1000);
+        Random rnd = new Random(0x5EED);
 
         for (int i = 1; i <= numIters; i++) {
             float eta = eta0 / (1.0f + eta0 * lambda * i);

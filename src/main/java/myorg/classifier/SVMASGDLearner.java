@@ -22,7 +22,7 @@ public class SVMASGDLearner {
 
         int dataSize = fVecList.size();
 
-        Random rnd = new Random(1000);
+        Random rnd = new Random(0x5EED);
 
         float[] params = {1.0f, 1.0f, 1.0f};
 

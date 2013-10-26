@@ -19,7 +19,7 @@ public class SVMInvariantUpdateLearner {
 
         int dataSize = fVecList.size();
 
-        Random rnd = new Random(1000);
+        Random rnd = new Random(0x5EED);
 
         float t = 1.0f;
         for (int i = 1; i <= numIters; i++) {
@@ -44,7 +44,7 @@ public class SVMInvariantUpdateLearner {
 
         int dataSize = fVecList.size();
 
-        Random rnd = new Random(1000);
+        Random rnd = new Random(0x5EED);
 
         float t = 1.0f;
         for (int i = 1; i <= numIters; i++) {

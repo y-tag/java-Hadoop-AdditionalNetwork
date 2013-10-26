@@ -21,7 +21,7 @@ public class SVMDCDLearner {
             return;
         }
 
-        Random rnd = new Random(1000);
+        Random rnd = new Random(0x5EED);
 
         int dataSize = fVecList.size();
         int[] idxArray = new int[dataSize];
