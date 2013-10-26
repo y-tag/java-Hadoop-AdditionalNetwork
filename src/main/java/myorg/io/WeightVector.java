@@ -12,10 +12,10 @@ import org.apache.hadoop.io.Writable;
 import myorg.io.FeatureVector;
 
 public class WeightVector implements Writable {
-    protected int dim = 0;
-    protected float[] weightArray = null;
-    protected float scaleFactor = 1.0f;
-    protected float squaredNorm = 0.0f;
+    private int dim = 0;
+    private float[] weightArray = null;
+    private float scaleFactor = 1.0f;
+    private float squaredNorm = 0.0f;
 
     public WeightVector() {
         this(0);

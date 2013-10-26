@@ -12,12 +12,12 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.Text;
 
 public class FeatureVector implements Writable {
-    protected int dim;
-    protected int[] indices;
-    protected float[] values;
-    protected float squaredNorm;
-    protected float label;
-    protected String name;
+    private int dim;
+    private int[] indices;
+    private float[] values;
+    private float squaredNorm;
+    private float label;
+    private String name;
 
     public FeatureVector() {
         clear();
