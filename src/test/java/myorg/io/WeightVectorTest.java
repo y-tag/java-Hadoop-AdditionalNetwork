@@ -52,7 +52,7 @@ public class WeightVectorTest {
 
         WeightVector w2 = new WeightVector(w1.toString());
 
-        assertEquals(w1.getDimensions(), w2.getDimensions());
+        assertEquals(dim, w2.getDimensions());
 
         for (int i = 0; i < w2.getDimensions(); i++) {
             assertEquals(w1.getValue(i), w2.getValue(i), epsilon);
