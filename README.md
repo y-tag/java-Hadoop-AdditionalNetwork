@@ -27,6 +27,9 @@ References
 - Cho-Jui Hsieh, Kai-Wei Chang, Chih-Jen Lin, S. Sathiya Keerthi and S Sundararajan. (2008). A Dual Coordinate Descent Method for Large-scale Linear SVM. ICML 2008.
 - Alekh Agarwal, Olivier Chapelle, Miroslav Dudik and John Langford. (2011). A Reliable Effective Terascale Linear Learning System. CoRR. 
 - Nikos Karampatziakis and John Langford. (2010). Importance Weight Aware Gradient Updates. CoRR.
+- Daniel Golovin, D. Sculley, H. Brendan McMahan and Michael Young. (2013). Large-Scale Learning with Less RAM via Randomization. CoRR.
+- H. Brendan McMahan, Gary Holt, D. Sculley, Michael Young, Dietmar Ebner, Julian Grady, Lan Nie, Todd Phillips, Eugene Davydov, Daniel Golovin, Sharat Chikkerur, Dan Liu, Martin Wattenberg, Arnar Mar Hrafnkelsson, Tom Boulos, Jeremy Kubica. (2013). Ad Click Prediction: a View from the Trenches. KDD 2013.
+- L\'{e}on Bottou. (2012). Stochastic Gradient Tricks. Neural Networks, Tricks of the Trade, Reloaded. http://leon.bottou.org/papers/bottou-tricks-2012
 
 AUTHOR
 ------
