@@ -1,62 +1,31 @@
 package myorg.examples.classifier;
 
-import java.io.BufferedReader;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.zip.GZIPInputStream;
-
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
-import myorg.util.SVMLightFormatParser;
+import myorg.io.WritableCacheReader;
 
 public class BinaryClassifierTestRunner {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.err.println("Usage: file_name weight_name");
+            System.err.println("Usage: test_bin weight_bin");
             return;
         }
-        String fileName = args[0];
-        String weightName = args[1];
+        String testBin = args[0];
+        String weightBin = args[1];
 
-        BufferedReader weightReader;
+        WritableCacheReader weightReader = new WritableCacheReader(weightBin);
 
-        if (weightName.endsWith(".gz")) {
-            weightReader = new BufferedReader(new InputStreamReader(
-                                              new GZIPInputStream(new BufferedInputStream(
-                                              new FileInputStream(weightName)))));
-        } else {
-            weightReader = new BufferedReader(new InputStreamReader(
-                                             new BufferedInputStream(
-                                             new FileInputStream(weightName))));
-        }
-
-        WeightVector weight = new WeightVector(weightReader.readLine());
+        WeightVector weight = new WeightVector();
+        weightReader.read(weight);
         weightReader.close();
-
-        BufferedReader reader;
-        
-        if (fileName.endsWith(".gz")) {
-            reader = new BufferedReader(new InputStreamReader(
-                                        new GZIPInputStream(new BufferedInputStream(
-                                        new FileInputStream(fileName)))));
-        } else {
-            reader = new BufferedReader(new InputStreamReader(
-                                        new BufferedInputStream(
-                                        new FileInputStream(fileName))));
-        }
-
-        String line;
-        FeatureVector datum = new FeatureVector();
 
         long num = 0;
         long correct = 0;
+        FeatureVector datum = new FeatureVector();
 
-        while ((line = reader.readLine()) != null) {
-            datum.clear();
-            SVMLightFormatParser.parse(line, datum);
-
+        WritableCacheReader testReader = new WritableCacheReader(testBin);
+        while (testReader.read(datum) > 0) {
             float score = weight.innerProduct(datum);
 
             num++;
@@ -64,10 +33,9 @@ public class BinaryClassifierTestRunner {
                 correct++;
             }
         }
-        reader.close();
+        testReader.close();
 
         System.out.println("Accuracy = " + Double.toString(100.0 * correct / num) + "% " + "(" + Long.toString(correct) + "/" + Long.toString(num) + ")");
-
     }
 
 }

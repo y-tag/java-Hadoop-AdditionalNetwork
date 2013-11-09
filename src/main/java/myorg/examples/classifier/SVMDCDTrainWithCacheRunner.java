@@ -1,53 +1,26 @@
 package myorg.examples.classifier;
 
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
 import myorg.io.WritableCacheReader;
 import myorg.io.WritableCacheWriter;
-import myorg.util.SVMLightFormatParser;
 import myorg.classifier.SVMDCDLearner;
 
 public class SVMDCDTrainWithCacheRunner {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.err.println("Usage: file_name weight_name");
+            System.err.println("Usage: train_bin weight_bin");
             return;
         }
-        String fileName = args[0];
-        String weightName = args[1];
-
-        float C = 1.0f;
-        int maxIters = 10;
-        String cacheName  = "cache";
-
-        BufferedReader reader;
-        
-        if (fileName.endsWith(".gz")) {
-            reader = new BufferedReader(new InputStreamReader(
-                                        new GZIPInputStream(new BufferedInputStream(
-                                        new FileInputStream(fileName)))));
-        } else {
-            reader = new BufferedReader(new InputStreamReader(
-                                        new BufferedInputStream(
-                                        new FileInputStream(fileName))));
-        }
+        String trainBin = args[0];
+        String weightBin = args[1];
 
         int dim = 1 << 24;
-        String line;
+        float C = 1.0f;
+        int maxEpochs = 10;
         FeatureVector datum = new FeatureVector();
         WeightVector weight = new WeightVector(dim);
 
@@ -58,12 +31,8 @@ public class SVMDCDTrainWithCacheRunner {
         ArrayList<Float> alphaList = new ArrayList<Float>();
         float[] alpha = new float[1];
 
-        WritableCacheWriter cacheWriter = new WritableCacheWriter(cacheName);
-        while ((line = reader.readLine()) != null) {
-            datum.clear();
-            SVMLightFormatParser.parse(line, datum);
-            cacheWriter.write(datum);
-
+        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        while (trainReader.read(datum) > 0) {
             alpha[0] = 0.0f;
             float sNorm = datum.getSquaredNorm();
 
@@ -72,16 +41,15 @@ public class SVMDCDTrainWithCacheRunner {
             alphaList.add(alpha[0]);
             sNormList.add(sNorm);
         }
-        cacheWriter.close();
+        trainReader.reopen();
 
-        WritableCacheReader cacheReader = new WritableCacheReader(cacheName);
-        for (int iter = 2; iter <= maxIters; iter++) {
+        for (int epoch = 1; epoch < maxEpochs; epoch++) {
             int i = 0;
             float maxPG = -Float.MAX_VALUE;
             float minPG =  Float.MAX_VALUE;
             float PG = 0.0f;
 
-            while (cacheReader.read(datum) > 0) {
+            while (trainReader.read(datum) > 0) {
                 alpha[0] = alphaList.get(i);
                 float sNorm = sNormList.get(i);
 
@@ -92,37 +60,18 @@ public class SVMDCDTrainWithCacheRunner {
                 minPG = Math.min(PG, minPG);
                 i++;
             }
-            cacheReader.reopen();
+            trainReader.reopen();
 
             if (maxPG - minPG < 1.0e-6) {
                 break;
             }
         }
-        cacheReader.close();
+        trainReader.close();
 
-        
-        File cacheFile = new File(cacheName);
-        if (cacheFile.exists()) {
-            cacheFile.delete();
-        }
+        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
 
-
-        BufferedWriter weightWriter;
-        
-        if (weightName.endsWith(".gz")) {
-            weightWriter = new BufferedWriter(new OutputStreamWriter(
-                                        new GZIPOutputStream(new BufferedOutputStream(
-                                        new FileOutputStream(weightName)))));
-        } else {
-            weightWriter = new BufferedWriter(new OutputStreamWriter(
-                                        new BufferedOutputStream(
-                                        new FileOutputStream(weightName))));
-        }
-
-        weightWriter.write(weight.toString());
-        weightWriter.flush();
+        weightWriter.write(weight);
         weightWriter.close();
-
     }
 
 }

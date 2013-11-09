@@ -1,79 +1,44 @@
 package myorg.examples.classifier;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 import java.util.ArrayList;
 
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
-import myorg.util.SVMLightFormatParser;
+import myorg.io.WritableCacheReader;
+import myorg.io.WritableCacheWriter;
 import myorg.classifier.SVMDCDLearner;
 
 public class SVMDCDTrainInMemoryRunner {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.err.println("Usage: file_name weight_name");
+            System.err.println("Usage: train_bin weight_bin");
             return;
         }
-        String fileName = args[0];
-        String weightName = args[1];
-
-        float C = 1.0f;
-        int maxIters = 10;
-
-        BufferedReader reader;
-        
-        if (fileName.endsWith(".gz")) {
-            reader = new BufferedReader(new InputStreamReader(
-                                        new GZIPInputStream(new BufferedInputStream(
-                                        new FileInputStream(fileName)))));
-        } else {
-            reader = new BufferedReader(new InputStreamReader(
-                                        new BufferedInputStream(
-                                        new FileInputStream(fileName))));
-        }
+        String trainBin = args[0];
+        String weightBin = args[1];
 
         int dim = 1 << 24;
-        String line;
+        float C = 1.0f;
+        int maxEpochs = 10;
         WeightVector weight = new WeightVector(dim);
 
+        FeatureVector datum = new FeatureVector();
         ArrayList<FeatureVector> data = new ArrayList<FeatureVector>();
 
-        while ((line = reader.readLine()) != null) {
-            FeatureVector datum = new FeatureVector();
-            SVMLightFormatParser.parse(line, datum);
-
+        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        while (trainReader.read(datum) > 0) {
             data.add(datum);
+            datum = new FeatureVector();
         }
+        trainReader.close();
 
-        SVMDCDLearner.learnWithLoop(data, C, SVMDCDLearner.LossType.SQUAREDHINGE, maxIters, weight);
+        SVMDCDLearner.learnWithLoop(data, C, SVMDCDLearner.LossType.SQUAREDHINGE, maxEpochs, weight);
 
-        
-        BufferedWriter weightWriter;
-        
-        if (weightName.endsWith(".gz")) {
-            weightWriter = new BufferedWriter(new OutputStreamWriter(
-                                        new GZIPOutputStream(new BufferedOutputStream(
-                                        new FileOutputStream(weightName)))));
-        } else {
-            weightWriter = new BufferedWriter(new OutputStreamWriter(
-                                        new BufferedOutputStream(
-                                        new FileOutputStream(weightName))));
-        }
+        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
 
-        weightWriter.write(weight.toString());
-        weightWriter.flush();
+        weightWriter.write(weight);
         weightWriter.close();
-
     }
 
 }
