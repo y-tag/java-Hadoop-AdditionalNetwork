@@ -39,7 +39,7 @@ public class SVMLightFormatToBinConverter {
         WritableCacheWriter cacheWriter = new WritableCacheWriter(binName);
         while ((line = reader.readLine()) != null) {
             datum.clear();
-            SVMLightFormatParser.parse(line, datum);
+            SVMLightFormatParser.parse(line, datum, true);
             cacheWriter.write(datum);
         }
         cacheWriter.close();
