@@ -20,7 +20,6 @@ public class LessRAMWeightVector extends WeightVector {
     private float squaredNorm = 0.0f;
 
     private static int P2p13 = 1 << 13;
-    private static float MAX_VALUE = Short.MAX_VALUE / P2p13;
     private static long SEED = 0x5EED;
 
     public LessRAMWeightVector() {
@@ -57,7 +56,7 @@ public class LessRAMWeightVector extends WeightVector {
             ip += weightArray[idx] * val;
         }
 
-        return ip * scaleFactor * xScale;
+        return ip * scaleFactor * xScale / P2p13;
     }
 
     @Override
