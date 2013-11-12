@@ -2,11 +2,12 @@ package myorg.examples.classifier;
 
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
+import myorg.io.LessRAMWeightVector;
 import myorg.io.WritableCacheReader;
 import myorg.io.WritableCacheWriter;
-import myorg.classifier.LogResSGDLearner;
+import myorg.classifier.LogRegSGDLearner;
 
-public class LogResSGDTrainWithCacheRunner {
+public class LessRAMLogRegSGDTrainWithCacheRunner {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
@@ -21,14 +22,14 @@ public class LogResSGDTrainWithCacheRunner {
         float lambda = 1e-6f;
         int numEpochs = 2;
         FeatureVector datum = new FeatureVector();
-        WeightVector weight = new WeightVector(dim);
+        WeightVector weight = new LessRAMWeightVector(dim);
 
         long i = 1;
         WritableCacheReader trainReader = new WritableCacheReader(trainBin);
         for (int n = 0; n < numEpochs; n++) {
             while (trainReader.read(datum) > 0) {
                 float eta = eta0 / (1.0f + eta0 * lambda * i);
-                LogResSGDLearner.learnWithStochasticOneStep(datum, eta, lambda, weight);
+                LogRegSGDLearner.learnWithStochasticOneStep(datum, eta, lambda, weight);
                 i++;
             }
             trainReader.reopen();
