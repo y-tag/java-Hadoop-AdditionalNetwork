@@ -1,6 +1,7 @@
 package myorg.examples.classifier;
 
 import myorg.io.FeatureVector;
+import myorg.io.WeightVector;
 import myorg.io.WeightMatrix;
 import myorg.io.WritableCacheReader;
 import myorg.io.WritableCacheWriter;
@@ -32,13 +33,14 @@ public class MaxEntSGDTrainWithCacheRunner {
         }
 
         WeightMatrix weightMatrix = new WeightMatrix(maxLabel + 1, dim);
+        WeightVector biasVector   = new WeightVector(maxLabel + 1);
 
         int i = 1;
         for (int n = 0; n < numEpochs; n++) {
             trainReader.reopen();
             while (trainReader.read(datum) > 0) {
                 float eta = eta0 / (1.0f + eta0 * lambda * i);
-                MaxEntSGDLearner.learnWithStochasticOneStep(datum, eta, lambda, weightMatrix);
+                MaxEntSGDLearner.learnWithStochasticOneStep(datum, eta, lambda, weightMatrix, biasVector);
                 i++;
             }
         }
@@ -46,6 +48,7 @@ public class MaxEntSGDTrainWithCacheRunner {
 
         WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
         weightWriter.write(weightMatrix);
+        weightWriter.write(biasVector);
         weightWriter.close();
     }
 

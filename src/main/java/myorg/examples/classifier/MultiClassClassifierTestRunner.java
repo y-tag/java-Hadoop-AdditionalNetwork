@@ -3,6 +3,7 @@ package myorg.examples.classifier;
 import java.util.ArrayList;
 
 import myorg.io.FeatureVector;
+import myorg.io.WeightVector;
 import myorg.io.WeightMatrix;
 import myorg.io.WritableCacheReader;
 import myorg.io.WritableCacheWriter;
@@ -20,6 +21,8 @@ public class MultiClassClassifierTestRunner {
         WritableCacheReader weightReader = new WritableCacheReader(weightBin);
         WeightMatrix weightMatrix = new WeightMatrix();
         weightReader.read(weightMatrix);
+        WeightVector biasVector = new WeightVector();
+        weightReader.read(biasVector);
         weightReader.close();
 
         long num = 0;
@@ -32,8 +35,9 @@ public class MultiClassClassifierTestRunner {
             int pLabel = -1;
             float maxScore = -Float.MAX_VALUE;
             for (int l = 0; l < prodArray.length; l++) {
-                if (prodArray[l] > maxScore) {
-                    maxScore = prodArray[l];
+                float score = prodArray[l] + biasVector.getValue(l);
+                if (score > maxScore) {
+                    maxScore = score;
                     pLabel = l;
                 }
             }

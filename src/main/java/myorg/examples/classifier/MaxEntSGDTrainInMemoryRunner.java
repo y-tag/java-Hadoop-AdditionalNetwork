@@ -3,6 +3,7 @@ package myorg.examples.classifier;
 import java.util.ArrayList;
 
 import myorg.io.FeatureVector;
+import myorg.io.WeightVector;
 import myorg.io.WeightMatrix;
 import myorg.io.WritableCacheReader;
 import myorg.io.WritableCacheWriter;
@@ -39,11 +40,13 @@ public class MaxEntSGDTrainInMemoryRunner {
         trainReader.close();
 
         WeightMatrix weightMatrix = new WeightMatrix(maxLabel + 1, dim);
+        WeightVector biasVector   = new WeightVector(maxLabel + 1);
 
-        MaxEntSGDLearner.learnWithStochasticLoop(data, eta0, lambda, numIters, weightMatrix);
+        MaxEntSGDLearner.learnWithStochasticLoop(data, eta0, lambda, numIters, weightMatrix, biasVector);
         
         WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
         weightWriter.write(weightMatrix);
+        weightWriter.write(biasVector);
         weightWriter.close();
     }
 
