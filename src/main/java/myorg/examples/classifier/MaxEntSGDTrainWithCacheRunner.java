@@ -1,7 +1,7 @@
 package myorg.examples.classifier;
 
 import myorg.io.FeatureVector;
-import myorg.io.WeightVector;
+import myorg.io.WeightMatrix;
 import myorg.io.WritableCacheReader;
 import myorg.io.WritableCacheWriter;
 import myorg.classifier.MaxEntSGDLearner;
@@ -31,10 +31,7 @@ public class MaxEntSGDTrainWithCacheRunner {
             }
         }
 
-        WeightVector[] weightMatrix = new WeightVector[maxLabel + 1];
-        for (int r = 0; r < weightMatrix.length; r++) {
-            weightMatrix[r] = new WeightVector(dim);
-        }
+        WeightMatrix weightMatrix = new WeightMatrix(maxLabel + 1, dim);
 
         int i = 1;
         for (int n = 0; n < numEpochs; n++) {
@@ -48,10 +45,7 @@ public class MaxEntSGDTrainWithCacheRunner {
         trainReader.close();
 
         WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
-
-        for (int r = 0; r < weightMatrix.length; r++) {
-            weightWriter.write(weightMatrix[r]);
-        }
+        weightWriter.write(weightMatrix);
         weightWriter.close();
     }
 
