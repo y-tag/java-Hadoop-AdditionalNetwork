@@ -15,11 +15,18 @@ public class SVMLightFormatToBinConverter {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.err.println("Usage: file_name bin_name");
+            System.err.println("Usage: file_name bin_name [use_bias]");
             return;
         }
         String fileName = args[0];
         String binName = args[1];
+        String useBias = args.length > 2 ? args[2] : "true";
+
+        boolean isBiasUsed = true;
+        if (useBias.charAt(0) == 'f' || useBias.charAt(0) == 'F' ||
+            useBias.charAt(0) == 'n' || useBias.charAt(0) == 'N') {
+            isBiasUsed = false;
+        }
 
         BufferedReader reader;
         
@@ -39,7 +46,7 @@ public class SVMLightFormatToBinConverter {
         WritableCacheWriter cacheWriter = new WritableCacheWriter(binName);
         while ((line = reader.readLine()) != null) {
             datum.clear();
-            SVMLightFormatParser.parse(line, datum, true);
+            SVMLightFormatParser.parse(line, datum, isBiasUsed);
             cacheWriter.write(datum);
         }
         cacheWriter.close();
