@@ -52,7 +52,7 @@ public class WeightMatrix implements Writable {
                     continue;
                 }
 
-                retArray[r] += getValue(r, idx) * val;
+                retArray[r] += weightArray[getArrayIndex(r, idx)] * val;
             }
 
             retArray[r] *= scaleFactor * xScale;
@@ -76,8 +76,7 @@ public class WeightMatrix implements Writable {
                 continue;
             }
 
-            float v = getValue(r, idx);
-            setValue(r, idx, v + val * s);
+            weightArray[getArrayIndex(r, idx)] += val * s;
         }
     }
 
