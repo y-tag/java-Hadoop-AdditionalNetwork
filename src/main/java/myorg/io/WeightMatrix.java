@@ -61,6 +61,30 @@ public class WeightMatrix implements Writable {
         return retArray;
     }
 
+    public float[] product(float[] x) {
+        return product(x, 1.0f);
+    }
+
+    public float[] product(float[] x, float xScale) {
+        float[] retArray = new float[row];
+
+        if (xScale == 0.0f) {
+            return retArray;
+        }
+
+        for (int r = 0; r < row; r++) {
+            for (int i = 0; i < x.length; i++) {
+                if (i >= col) {
+                    continue;
+                }
+                retArray[r] += weightArray[getArrayIndex(r, i)] * x[i];
+            }
+            retArray[r] *= scaleFactor * xScale;
+        }
+
+        return retArray;
+    }
+
     public void addVectorToRow(int r, FeatureVector x) {
         addVectorToRow(r, x, 1.0f);
     }
@@ -77,6 +101,21 @@ public class WeightMatrix implements Writable {
             }
 
             weightArray[getArrayIndex(r, idx)] += val * s;
+        }
+    }
+
+    public void addVectorToRow(int r, float[] x) {
+        addVectorToRow(r, x, 1.0f);
+    }
+
+    public void addVectorToRow(int r, float[] x, float xScale) {
+        float s = xScale / scaleFactor;
+        for (int i = 0; i < x.length; i++) {
+            if (i >= col) {
+                System.err.println("dimention over in addVectorToRow: " + i + " >= " + col);
+                break;
+            }
+            weightArray[getArrayIndex(r, i)] += x[i] * s;
         }
     }
 

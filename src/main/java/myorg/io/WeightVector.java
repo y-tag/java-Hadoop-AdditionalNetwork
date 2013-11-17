@@ -100,6 +100,24 @@ public class WeightVector implements Writable {
         }
     }
 
+    public void addVector(float[] x) {
+        addVector(x, 1.0f);
+    }
+
+    public void addVector(float[] x, float xScale) {
+        float s = xScale / scaleFactor;
+        for (int i = 0; i < x.length; i++) {
+            if (i >= dim) {
+                System.err.println("dimention over in addVector: " + i + " >= " + dim);
+                break;
+            }
+
+            squaredNorm -= weightArray[i] * weightArray[i];
+            weightArray[i] += x[i] * s;
+            squaredNorm += weightArray[i] * weightArray[i];
+        }
+    }
+
     public void scale(float xScale) {
         scaleFactor *= xScale;
         if (Math.abs(scaleFactor) < 1e-10) {
