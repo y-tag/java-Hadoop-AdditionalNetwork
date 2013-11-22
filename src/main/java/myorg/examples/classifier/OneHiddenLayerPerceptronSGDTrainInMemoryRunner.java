@@ -23,7 +23,7 @@ public class OneHiddenLayerPerceptronSGDTrainInMemoryRunner {
         int dim2 = 1 << 9;
         float eta0 = 1e-2f;
         float lambda = 1e-4f;
-        int numIters = 3000000;
+        int numIters = 100000;
 
         FeatureVector datum = new FeatureVector();
         ArrayList<FeatureVector> data = new ArrayList<FeatureVector>();
