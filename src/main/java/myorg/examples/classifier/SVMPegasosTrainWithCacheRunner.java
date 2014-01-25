@@ -23,7 +23,7 @@ public class SVMPegasosTrainWithCacheRunner {
         WeightVector weight = new WeightVector(dim);
 
         long i = 1;
-        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        WritableCacheReader<FeatureVector> trainReader = new WritableCacheReader<FeatureVector>(trainBin);
         for (int n = 0; n < numEpochs; n++) {
             while (trainReader.read(datum) > 0) {
                 float eta = 1.0f / (lambda * i);
@@ -34,7 +34,7 @@ public class SVMPegasosTrainWithCacheRunner {
         }
         trainReader.close();
 
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
+        WritableCacheWriter<WeightVector> weightWriter = new WritableCacheWriter<WeightVector>(weightBin);
 
         weightWriter.write(weight);
         weightWriter.close();

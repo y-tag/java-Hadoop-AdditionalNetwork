@@ -1,5 +1,7 @@
 package myorg.examples.classifier;
 
+import org.apache.hadoop.io.Writable;
+
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
 import myorg.io.WeightMatrix;
@@ -25,7 +27,7 @@ public class MaxEntSGDTrainWithCacheRunner {
         int maxLabel = 0;
         FeatureVector datum = new FeatureVector();
 
-        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        WritableCacheReader<FeatureVector> trainReader = new WritableCacheReader<FeatureVector>(trainBin);
         while (trainReader.read(datum) > 0) {
             if (datum.getLabel() > maxLabel) {
                 maxLabel = (int)datum.getLabel();
@@ -46,7 +48,7 @@ public class MaxEntSGDTrainWithCacheRunner {
         }
         trainReader.close();
 
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
+        WritableCacheWriter<Writable> weightWriter = new WritableCacheWriter<Writable>(weightBin);
         weightWriter.write(weightMatrix);
         weightWriter.write(biasVector);
         weightWriter.close();

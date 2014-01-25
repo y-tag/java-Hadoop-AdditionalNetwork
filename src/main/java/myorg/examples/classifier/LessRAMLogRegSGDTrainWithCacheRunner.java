@@ -25,7 +25,7 @@ public class LessRAMLogRegSGDTrainWithCacheRunner {
         WeightVector weight = new LessRAMWeightVector(dim);
 
         long i = 1;
-        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        WritableCacheReader<FeatureVector> trainReader = new WritableCacheReader<FeatureVector>(trainBin);
         for (int n = 0; n < numEpochs; n++) {
             while (trainReader.read(datum) > 0) {
                 float eta = eta0 / (1.0f + eta0 * lambda * i);
@@ -36,7 +36,7 @@ public class LessRAMLogRegSGDTrainWithCacheRunner {
         }
         trainReader.close();
 
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
+        WritableCacheWriter<WeightVector> weightWriter = new WritableCacheWriter<WeightVector>(weightBin);
 
         weightWriter.write(weight);
         weightWriter.close();

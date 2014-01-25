@@ -2,6 +2,8 @@ package myorg.examples.classifier;
 
 import java.util.ArrayList;
 
+import org.apache.hadoop.io.Writable;
+
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
 import myorg.io.WeightMatrix;
@@ -29,7 +31,7 @@ public class OneHiddenLayerPerceptronSGDTrainInMemoryRunner {
         ArrayList<FeatureVector> data = new ArrayList<FeatureVector>();
         int maxLabel = 0;
 
-        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        WritableCacheReader<FeatureVector> trainReader = new WritableCacheReader<FeatureVector>(trainBin);
         while (trainReader.read(datum) > 0) {
             if (datum.getLabel() > maxLabel) {
                 maxLabel = (int)datum.getLabel();
@@ -55,7 +57,7 @@ public class OneHiddenLayerPerceptronSGDTrainInMemoryRunner {
 
         MultiLayerPerceptronSGDLearner.learnWithStochasticLoop(data, eta0, lambda, numIters, wList, bList);
         
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
+        WritableCacheWriter<Writable> weightWriter = new WritableCacheWriter<Writable>(weightBin);
         weightWriter.write(w1); weightWriter.write(b1);
         weightWriter.write(w2); weightWriter.write(b2);
         weightWriter.close();

@@ -24,7 +24,7 @@ public class LogRegSGDTrainWithCacheRunner {
         WeightVector weight = new WeightVector(dim);
 
         long i = 1;
-        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        WritableCacheReader<FeatureVector> trainReader = new WritableCacheReader<FeatureVector>(trainBin);
         for (int n = 0; n < numEpochs; n++) {
             while (trainReader.read(datum) > 0) {
                 float eta = eta0 / (1.0f + eta0 * lambda * i);
@@ -35,7 +35,7 @@ public class LogRegSGDTrainWithCacheRunner {
         }
         trainReader.close();
 
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
+        WritableCacheWriter<WeightVector> weightWriter = new WritableCacheWriter<WeightVector>(weightBin);
 
         weightWriter.write(weight);
         weightWriter.close();

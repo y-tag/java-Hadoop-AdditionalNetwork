@@ -43,7 +43,7 @@ public class SVMLightFormatToBinConverter {
         String line;
         FeatureVector datum = new FeatureVector();
 
-        WritableCacheWriter cacheWriter = new WritableCacheWriter(binName);
+        WritableCacheWriter<FeatureVector> cacheWriter = new WritableCacheWriter<FeatureVector>(binName);
         while ((line = reader.readLine()) != null) {
             datum.clear();
             SVMLightFormatParser.parse(line, datum, isBiasUsed);

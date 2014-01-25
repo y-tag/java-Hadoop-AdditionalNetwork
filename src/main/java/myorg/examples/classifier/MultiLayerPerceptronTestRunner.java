@@ -2,6 +2,8 @@ package myorg.examples.classifier;
 
 import java.util.ArrayList;
 
+import org.apache.hadoop.io.Writable;
+
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
 import myorg.io.WeightMatrix;
@@ -23,7 +25,7 @@ public class MultiLayerPerceptronTestRunner {
         ArrayList<WeightMatrix> wList = new ArrayList<WeightMatrix>();
         ArrayList<WeightVector> bList = new ArrayList<WeightVector>();
 
-        WritableCacheReader weightReader = new WritableCacheReader(weightBin);
+        WritableCacheReader<Writable> weightReader = new WritableCacheReader<Writable>(weightBin);
         while (true) {
             WeightMatrix w = new WeightMatrix();
             WeightVector b = new WeightVector();
@@ -37,7 +39,7 @@ public class MultiLayerPerceptronTestRunner {
         long correct = 0;
         FeatureVector datum = new FeatureVector();
 
-        WritableCacheReader testReader = new WritableCacheReader(testBin);
+        WritableCacheReader<FeatureVector> testReader = new WritableCacheReader<FeatureVector>(testBin);
         while (testReader.read(datum) > 0) {
             float[] predArray = MultiLayerPerceptronSGDLearner.predict(datum, wList, bList);
             int pLabel = -1;

@@ -2,6 +2,8 @@ package myorg.examples.classifier;
 
 import java.util.ArrayList;
 
+import org.apache.hadoop.io.Writable;
+
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
 import myorg.io.WeightMatrix;
@@ -18,7 +20,7 @@ public class MultiClassClassifierTestRunner {
         String testBin = args[0];
         String weightBin = args[1];
 
-        WritableCacheReader weightReader = new WritableCacheReader(weightBin);
+        WritableCacheReader<Writable> weightReader = new WritableCacheReader<Writable>(weightBin);
         WeightMatrix weightMatrix = new WeightMatrix();
         weightReader.read(weightMatrix);
         WeightVector biasVector = new WeightVector();
@@ -29,7 +31,7 @@ public class MultiClassClassifierTestRunner {
         long correct = 0;
         FeatureVector datum = new FeatureVector();
 
-        WritableCacheReader testReader = new WritableCacheReader(testBin);
+        WritableCacheReader<FeatureVector> testReader = new WritableCacheReader<FeatureVector>(testBin);
         while (testReader.read(datum) > 0) {
             float[] prodArray = weightMatrix.product(datum);
             int pLabel = -1;

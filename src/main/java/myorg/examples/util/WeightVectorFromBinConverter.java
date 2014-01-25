@@ -15,7 +15,7 @@ public class WeightVectorFromBinConverter {
         }
         String weightBin = args[0];
 
-        WritableCacheReader weightReader = new WritableCacheReader(weightBin);
+        WritableCacheReader<WeightVector> weightReader = new WritableCacheReader<WeightVector>(weightBin);
 
         WeightVector weight = new WeightVector();
         while (weightReader.read(weight) > 0) {

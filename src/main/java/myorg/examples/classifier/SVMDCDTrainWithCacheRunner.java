@@ -31,7 +31,7 @@ public class SVMDCDTrainWithCacheRunner {
         ArrayList<Float> alphaList = new ArrayList<Float>();
         float[] alpha = new float[1];
 
-        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        WritableCacheReader<FeatureVector> trainReader = new WritableCacheReader<FeatureVector>(trainBin);
         while (trainReader.read(datum) > 0) {
             alpha[0] = 0.0f;
             float sNorm = datum.getSquaredNorm();
@@ -68,7 +68,7 @@ public class SVMDCDTrainWithCacheRunner {
         }
         trainReader.close();
 
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
+        WritableCacheWriter<WeightVector> weightWriter = new WritableCacheWriter<WeightVector>(weightBin);
 
         weightWriter.write(weight);
         weightWriter.close();

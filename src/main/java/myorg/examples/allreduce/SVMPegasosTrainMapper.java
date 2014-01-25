@@ -80,7 +80,7 @@ public class SVMPegasosTrainMapper extends Mapper<Object, Text, Text, Text> {
             WeightVector weight = new WeightVector(dim);
             WeightVectorWithCount wwc = new WeightVectorWithCount(1, weight);
             FeatureVector datum = new FeatureVector();
-            WritableCacheWriter cacheWriter = new WritableCacheWriter(cacheName);
+            WritableCacheWriter<FeatureVector> cacheWriter = new WritableCacheWriter<FeatureVector>(cacheName);
 
             while (context.nextKeyValue()) {
                 Object inKey = context.getCurrentKey();
@@ -101,7 +101,7 @@ public class SVMPegasosTrainMapper extends Mapper<Object, Text, Text, Text> {
             weight = wwc.getWeight();
             weight.scale(1.0f / wwc.getCount()); // averaging
 
-            WritableCacheReader cacheReader = new WritableCacheReader(cacheName);
+            WritableCacheReader<FeatureVector> cacheReader = new WritableCacheReader<FeatureVector>(cacheName);
             for (int epoch = 1; epoch < numEpochs; epoch++) {
                 while (cacheReader.read(datum) > 0) {
                     float eta = 1.0f / (lambda * i);

@@ -14,7 +14,7 @@ public class BinaryClassifierTestRunner {
         String testBin = args[0];
         String weightBin = args[1];
 
-        WritableCacheReader weightReader = new WritableCacheReader(weightBin);
+        WritableCacheReader<WeightVector> weightReader = new WritableCacheReader<WeightVector>(weightBin);
 
         WeightVector weight = new WeightVector();
         weightReader.read(weight);
@@ -24,7 +24,7 @@ public class BinaryClassifierTestRunner {
         long correct = 0;
         FeatureVector datum = new FeatureVector();
 
-        WritableCacheReader testReader = new WritableCacheReader(testBin);
+        WritableCacheReader<FeatureVector> testReader = new WritableCacheReader<FeatureVector>(testBin);
         while (testReader.read(datum) > 0) {
             float score = weight.innerProduct(datum);
 

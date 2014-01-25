@@ -15,7 +15,7 @@ public class WeightMatrixFromBinConverter {
         }
         String weightBin = args[0];
 
-        WritableCacheReader weightReader = new WritableCacheReader(weightBin);
+        WritableCacheReader<WeightMatrix> weightReader = new WritableCacheReader<WeightMatrix>(weightBin);
 
         WeightMatrix wMatrix = new WeightMatrix();
         while (weightReader.read(wMatrix) > 0) {

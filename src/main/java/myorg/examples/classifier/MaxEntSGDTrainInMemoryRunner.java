@@ -2,6 +2,8 @@ package myorg.examples.classifier;
 
 import java.util.ArrayList;
 
+import org.apache.hadoop.io.Writable;
+
 import myorg.io.FeatureVector;
 import myorg.io.WeightVector;
 import myorg.io.WeightMatrix;
@@ -28,7 +30,7 @@ public class MaxEntSGDTrainInMemoryRunner {
         ArrayList<FeatureVector> data = new ArrayList<FeatureVector>();
         int maxLabel = 0;
 
-        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        WritableCacheReader<FeatureVector> trainReader = new WritableCacheReader<FeatureVector>(trainBin);
         while (trainReader.read(datum) > 0) {
             if (datum.getLabel() > maxLabel) {
                 maxLabel = (int)datum.getLabel();
@@ -44,7 +46,7 @@ public class MaxEntSGDTrainInMemoryRunner {
 
         MaxEntSGDLearner.learnWithStochasticLoop(data, eta0, lambda, numIters, weightMatrix, biasVector);
         
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
+        WritableCacheWriter<Writable> weightWriter = new WritableCacheWriter<Writable>(weightBin);
         weightWriter.write(weightMatrix);
         weightWriter.write(biasVector);
         weightWriter.close();

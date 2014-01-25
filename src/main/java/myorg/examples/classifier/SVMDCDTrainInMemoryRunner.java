@@ -26,7 +26,7 @@ public class SVMDCDTrainInMemoryRunner {
         FeatureVector datum = new FeatureVector();
         ArrayList<FeatureVector> data = new ArrayList<FeatureVector>();
 
-        WritableCacheReader trainReader = new WritableCacheReader(trainBin);
+        WritableCacheReader<FeatureVector> trainReader = new WritableCacheReader<FeatureVector>(trainBin);
         while (trainReader.read(datum) > 0) {
             data.add(datum);
             datum = new FeatureVector();
@@ -35,7 +35,7 @@ public class SVMDCDTrainInMemoryRunner {
 
         SVMDCDLearner.learnWithLoop(data, C, SVMDCDLearner.LossType.SQUAREDHINGE, maxEpochs, weight);
 
-        WritableCacheWriter weightWriter = new WritableCacheWriter(weightBin);
+        WritableCacheWriter<WeightVector> weightWriter = new WritableCacheWriter<WeightVector>(weightBin);
 
         weightWriter.write(weight);
         weightWriter.close();
