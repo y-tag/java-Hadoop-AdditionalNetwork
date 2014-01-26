@@ -46,7 +46,7 @@ public class KDDCup2012Track2Scorer {
                 clicks = Integer.parseInt(st.nextToken());
                 imps   = Integer.parseInt(st.nextToken());
             } catch (Exception e) {
-                System.err.println(String.format("skip '%s' in solution file", line));
+                //System.err.println(String.format("skip '%s' in solution file", line));
                 continue;
             }
 
@@ -59,7 +59,7 @@ public class KDDCup2012Track2Scorer {
                 try {
                     prediction = Float.parseFloat(line);
                 } catch (Exception e) {
-                    System.err.println(String.format("skip '%s' in prediction file", line));
+                    //System.err.println(String.format("skip '%s' in prediction file", line));
                     continue;
                 }
 
@@ -88,8 +88,8 @@ public class KDDCup2012Track2Scorer {
         solutionReader.close();
         predictionReader.close();
 
-        System.err.println(String.format("#solutions:   %d", solutionNum));
-        System.err.println(String.format("#predictions: %d", predictionNum));
+        //System.err.println(String.format("#solutions:   %d", solutionNum));
+        //System.err.println(String.format("#predictions: %d", predictionNum));
 
         if (solutionNum != predictionNum) {
             throw new RuntimeException("number of lines are not the same!");
@@ -97,7 +97,23 @@ public class KDDCup2012Track2Scorer {
 
         double auc = AUCCalculator.calcAUC(ssList);
 
-        System.out.println(String.format("AUC: %f", auc));
+        double wrmse = 0.0;
+        double nwmae = 0.0;
+        double weightSum = 0.0;
+
+        for (ScoreStruct ss : ssList) {
+            double imps = ss.positive + ss.negative;
+            double diff = (ss.positive / imps) - ss.predict;
+            nwmae += Math.abs(diff) * imps;
+            wrmse += Math.pow(diff, 2.0) * imps;
+            weightSum += imps;
+        }
+        nwmae /= weightSum;
+        wrmse = Math.sqrt(wrmse / weightSum);
+
+        System.out.println(String.format("AUC  : %f", auc));
+        System.out.println(String.format("NWMAE: %f", nwmae));
+        System.out.println(String.format("WRMSE: %f", wrmse));
     }
 }
 
