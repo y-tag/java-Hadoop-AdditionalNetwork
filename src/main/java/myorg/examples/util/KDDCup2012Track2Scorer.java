@@ -69,7 +69,7 @@ public class KDDCup2012Track2Scorer {
             if (line == null) { break; }
 
             ScoreStruct ss = new ScoreStruct();
-            ss.predict = prediction;
+            ss.value = prediction;
             ss.positive = clicks;
             ss.negative = imps - clicks;
 
@@ -103,7 +103,7 @@ public class KDDCup2012Track2Scorer {
 
         for (ScoreStruct ss : ssList) {
             double imps = ss.positive + ss.negative;
-            double diff = (ss.positive / imps) - ss.predict;
+            double diff = (ss.positive / imps) - ss.value;
             nwmae += Math.abs(diff) * imps;
             wrmse += Math.pow(diff, 2.0) * imps;
             weightSum += imps;
