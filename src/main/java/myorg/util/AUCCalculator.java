@@ -11,10 +11,10 @@ public class AUCCalculator {
         Collections.sort(ssList);
 
         double auc = 0.0;
-        long oldPosSum = 0;
-        long posSum = 0;
-        long negSum = 0;
-        int negNum = 0;
+        double oldPosSum = 0;
+        double posSum = 0;
+        double negSum = 0;
+        double negNum = 0;
 
         float lastPredict = Float.MAX_VALUE;
 
