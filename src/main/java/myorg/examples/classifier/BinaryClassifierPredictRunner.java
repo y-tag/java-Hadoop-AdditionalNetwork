@@ -18,11 +18,13 @@ public class BinaryClassifierPredictRunner {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.err.println("Usage: test_bin weight_bin");
+            System.err.println("Usage: test_bin weight_bin [use_sigmoid]");
             return;
         }
         String testBin = args[0];
         String weightBin = args[1];
+
+        boolean use_sigmoid = (args.length > 2 && ! args[2].isEmpty()) ? true : false;
 
         WritableCacheReader<WeightVector> weightReader = new WritableCacheReader<WeightVector>(weightBin);
 
@@ -39,6 +41,9 @@ public class BinaryClassifierPredictRunner {
         WritableCacheReader<FeatureVector> testReader = new WritableCacheReader<FeatureVector>(testBin);
         while (testReader.read(datum) > 0) {
             float score = weight.innerProduct(datum);
+            if (use_sigmoid) {
+                score = 1.0f / (1.0f + (float)Math.exp(-score));
+            }
             writer.write(String.format("%f\n", score));
         }
         testReader.close();
